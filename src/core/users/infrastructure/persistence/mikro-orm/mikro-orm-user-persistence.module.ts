@@ -1,7 +1,8 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Module } from '@nestjs/common';
-import { PersistenceModule } from 'src/common/persistence-module';
-import { UserRepository } from 'src/core/users/domain';
+import { PersistenceModule } from 'common/persistence-module';
+
+import { UserRepository } from '@/users/domain';
 
 import { UserMikroOrm } from './models';
 import { UserRepositoryMikroOrm } from './user.repository.mikro-orm';

@@ -1,5 +1,6 @@
-import { DomainEvent } from 'src/common/domain';
-import { Member, MemberRoleLevel } from 'src/core/accounts/domain';
+import { DomainEvent } from 'common/domain';
+
+import { Member, MemberRoleLevel } from '@/accounts/domain';
 
 export class MemberInvitedEvent extends DomainEvent {
   readonly eventName = 'member.invited';

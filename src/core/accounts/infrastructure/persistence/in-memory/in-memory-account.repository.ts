@@ -1,4 +1,4 @@
-import { Account, AccountRepository } from 'src/core/accounts/domain';
+import { Account, AccountRepository } from '@/accounts/domain';
 
 export class InMemoryAccountRepository extends AccountRepository {
   private accounts: Map<string, Account> = new Map();

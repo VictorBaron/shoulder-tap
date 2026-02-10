@@ -44,21 +44,23 @@ The project follows a 7-phase build sequence defined in `build-sequence.md`. Alw
 
 ```
 src/
+  core/
+    slack/              # Bolt.js integration, event listeners, commands
+    auth/               # Slack OAuth + Google OAuth flows
+    messages/           # Message ingestion, pre-filtering, storage
+    scoring/            # LLM urgency scoring prompt + logic
+    calendar/           # Google Calendar sync, break detection
+    notifications/      # DM delivery, batching, digest jobs
+    users/              # User entity, preferences, activity tracking
+    accounts/           # Account & Member entities, customer accounts information
   app.module.ts
   main.ts
-  slack/              # Bolt.js integration, event listeners, commands
-  auth/               # Slack OAuth + Google OAuth flows
-  messages/           # Message ingestion, pre-filtering, storage
-  scoring/            # LLM urgency scoring prompt + logic
-  calendar/           # Google Calendar sync, break detection
-  notifications/      # DM delivery, batching, digest jobs
-  users/              # User entity, preferences, activity tracking
   common/             # Shared utilities, decorators, guards
 ```
 
 ### Database / MikroORM
 
-- Entities live in their respective module folders (e.g., `src/messages/message.entity.ts`)
+- Entities live in their respective module folders (e.g., `src/core/messages/domain/aggregates/message.aggregate.ts`)
 - Use MikroORM migrations — never modify the schema by hand
 - Entity naming: singular PascalCase (`User`, `Message`, `CalendarEvent`)
 - Always use transactions for multi-entity writes
@@ -66,14 +68,14 @@ src/
 ### Slack / Bolt.js
 
 - Bolt app instance is created in the `SlackModule` and injected via NestJS DI
-- All event listeners and command handlers live in `src/slack/`
+- All event listeners and command handlers live in `src/core/slack/`
 - User tokens (not bot tokens) are stored per-installation for reading messages
 - Bot token is used for sending DMs
 - Respect Slack rate limits — use queuing for bulk DM sends
 
 ### LLM Scoring
 
-- The urgency scoring prompt lives in `src/scoring/` — treat it as a first-class artifact; changes should be deliberate
+- The urgency scoring prompt lives in `src/core/scoring/` — treat it as a first-class artifact; changes should be deliberate
 - Urgency scale: 1 (FYI) → 5 (critical, needs response now)
 - Always store the raw score AND the LLM's reasoning with each scored message
 - Pre-filter before calling the LLM — only ~30% of messages should reach scoring
@@ -144,6 +146,7 @@ src/<module>/
 ```
 
 **Rules:**
+
 - Business logic belongs in domain entities/aggregates — NOT in services or handlers
 - Aggregates are fetched and saved as a whole unit via repositories
 - Domain entities are plain TS classes — never ORM/Prisma models
@@ -206,7 +209,7 @@ describe('SendMessageCommand', () => {
     const message = await messageRepository.findById(result.messageId);
     expect(message.isUrgent()).toBe(true);
     expect(message.getEvents()).toContainEqual(
-      expect.objectContaining({ type: 'MessageMarkedUrgent' })
+      expect.objectContaining({ type: 'MessageMarkedUrgent' }),
     );
   });
 });

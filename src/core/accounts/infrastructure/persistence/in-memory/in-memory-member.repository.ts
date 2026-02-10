@@ -1,4 +1,4 @@
-import { Member, MemberRepository } from 'src/core/accounts/domain';
+import { Member, MemberRepository } from '@/accounts/domain';
 
 export class InMemoryMemberRepository extends MemberRepository {
   private members: Map<string, Member> = new Map();

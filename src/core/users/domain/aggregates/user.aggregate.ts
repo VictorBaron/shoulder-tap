@@ -1,10 +1,11 @@
-import { AggregateRoot } from 'src/common/domain';
+import { AggregateRoot } from 'common/domain';
+
 import {
   Email,
   GoogleAccountLinkedEvent,
   UserCreatedEvent,
   UserUpdatedEvent,
-} from 'src/core/users/domain';
+} from '@/users/domain';
 
 import {
   CreateOAuthUserProps,

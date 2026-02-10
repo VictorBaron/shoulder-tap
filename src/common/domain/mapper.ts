@@ -1,4 +1,4 @@
-import { PersistenceEntity } from 'src/common/persistence-entity';
+import { PersistenceEntity } from 'common/persistence-entity';
 
 import { AggregateRoot } from './aggregate-root';
 

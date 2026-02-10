@@ -1,5 +1,6 @@
-import { RepositoryPort } from 'src/common/domain/repository-port';
-import { Member } from 'src/core/accounts/domain';
+import { RepositoryPort } from 'common/domain/repository-port';
+
+import { Member } from '@/accounts/domain';
 
 export abstract class MemberRepository extends RepositoryPort<Member> {
   abstract findById(id: string): Promise<Member | null>;

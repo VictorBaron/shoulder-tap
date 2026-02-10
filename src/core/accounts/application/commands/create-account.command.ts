@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
+
 import {
   Account,
   AccountRepository,
   Member,
   MemberRepository,
-} from 'src/core/accounts/domain';
+} from '@/accounts/domain';
 
 export class CreateAccountCommand {
   constructor(

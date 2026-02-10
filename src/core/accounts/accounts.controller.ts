@@ -9,8 +9,8 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { CookieAuthGuard } from 'auth/cookie-auth.guard';
 import { Request } from 'express';
-import { CookieAuthGuard } from 'src/auth/cookie-auth.guard';
 
 import {
   CreateAccountCommand,

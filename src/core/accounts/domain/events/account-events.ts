@@ -1,4 +1,4 @@
-import { DomainEvent } from 'src/common/domain';
+import { DomainEvent } from 'common/domain';
 
 export class AccountCreatedEvent extends DomainEvent {
   readonly eventName = 'account.created';

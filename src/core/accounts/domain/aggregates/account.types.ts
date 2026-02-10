@@ -1,4 +1,4 @@
-import { AggregateRootProps } from 'src/common/domain';
+import { AggregateRootProps } from 'common/domain';
 
 export interface AccountProps extends AggregateRootProps {
   name: string;

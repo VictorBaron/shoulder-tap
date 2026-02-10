@@ -6,8 +6,8 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { AccountMikroOrm } from './core/accounts/infrastructure/persistence/mikro-orm/models/account.mikroORM';
 import { MemberMikroOrm } from './core/accounts/infrastructure/persistence/mikro-orm/models/member.mikroORM';
+import { SlackModule } from './core/slack/slack.module';
 import { UserMikroOrm } from './core/users/infrastructure/persistence/mikro-orm/models/user.mikroORM';
-import { SlackModule } from './slack/slack.module';
 
 @Module({
   imports: [

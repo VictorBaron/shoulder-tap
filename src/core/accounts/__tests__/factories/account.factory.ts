@@ -1,4 +1,4 @@
-import { Account, AccountProps } from 'src/core/accounts/domain';
+import { Account, AccountProps } from '@/accounts/domain';
 
 export class AccountFactory {
   static create(overrides?: Partial<AccountProps>): Account {

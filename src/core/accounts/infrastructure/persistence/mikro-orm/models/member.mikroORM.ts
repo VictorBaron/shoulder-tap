@@ -1,15 +1,13 @@
-import { Entity, Index, PrimaryKey, Property, Unique } from '@mikro-orm/core';
-import { PersistenceEntity } from 'src/common/persistence-entity';
-import { MemberRoleLevel } from 'src/core/accounts/domain';
+import { Entity, Index, Property, Unique } from '@mikro-orm/core';
+import { PersistenceEntity } from 'common/persistence-entity';
+
+import { MemberRoleLevel } from '@/accounts/domain';
 
 @Entity({ tableName: 'member' })
 @Unique({ properties: ['accountId', 'userId'] })
 @Index({ properties: ['accountId'], name: 'idx_member_accountId' })
 @Index({ properties: ['userId'], name: 'idx_member_userId' })
 export class MemberMikroOrm extends PersistenceEntity {
-  @PrimaryKey({ type: 'uuid' })
-  id: string;
-
   @Property({ type: 'uuid' })
   accountId: string;
 
@@ -36,13 +34,4 @@ export class MemberMikroOrm extends PersistenceEntity {
 
   @Property({ type: 'jsonb' })
   preferences: Record<string, unknown>;
-
-  @Property({ type: 'timestamptz' })
-  createdAt: Date;
-
-  @Property({ type: 'timestamptz', onUpdate: () => new Date() })
-  updatedAt: Date;
-
-  @Property({ type: 'timestamptz', nullable: true })
-  deletedAt: Date | null;
 }

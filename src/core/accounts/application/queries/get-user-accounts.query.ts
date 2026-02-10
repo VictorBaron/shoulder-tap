@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
+
 import {
   Account,
   AccountRepository,
   MemberRepository,
-} from 'src/core/accounts/domain';
+} from '@/accounts/domain';
 
 export class GetUserAccountsQuery {
   constructor(readonly userId: string) {}

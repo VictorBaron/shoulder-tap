@@ -3,7 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Account, AccountRepository, Member } from 'src/core/accounts/domain';
+
+import { Account, AccountRepository, Member } from '@/accounts/domain';
 
 export class UpdateAccountCommand {
   constructor(

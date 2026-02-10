@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { UserRepository } from 'src/core/users/domain';
+
+import { UserRepository } from '@/users/domain';
 
 import { InMemoryUserRepository } from './user.repository.inmemory';
 

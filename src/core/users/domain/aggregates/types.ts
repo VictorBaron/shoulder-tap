@@ -1,5 +1,6 @@
-import { AggregateRootProps } from 'src/common/domain';
-import { Email } from 'src/core/users/domain';
+import { AggregateRootProps } from 'common/domain';
+
+import { Email } from '@/users/domain';
 
 export interface UserProps extends AggregateRootProps {
   email: Email;

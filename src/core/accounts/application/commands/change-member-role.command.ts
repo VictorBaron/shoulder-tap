@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+
 import {
   Member,
   MemberRepository,
   MemberRole,
   MemberRoleLevel,
-} from 'src/core/accounts/domain';
+} from '@/accounts/domain';
 
 export class ChangeMemberRoleCommand {
   constructor(

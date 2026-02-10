@@ -1,0 +1,42 @@
+services:
+  app:
+    build:
+      context: .
+      target: dev
+    container_name: shoulder-tap-app
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://shouldertap:shouldertap@postgres:5432/shouldertap
+    volumes:
+      - ./src:/app/src
+      - ./nest-cli.json:/app/nest-cli.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./tsconfig.build.json:/app/tsconfig.build.json
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: shoulder-tap-db
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: shouldertap
+      POSTGRES_PASSWORD: shouldertap
+      POSTGRES_DB: shouldertap
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'shouldertap']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

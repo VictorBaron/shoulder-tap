@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from 'src/auth/auth.module';
-import { UserPersistenceModule } from 'src/core/users/infrastructure';
+import { AuthModule } from 'auth/auth.module';
+
+import { UserPersistenceModule } from '@/users/infrastructure';
 
 import { AccountsController } from './accounts.controller';
 import {

@@ -19,7 +19,7 @@ module.exports = {
     ],
   },
   collectCoverageFrom: [
-    'src/core/**/*.ts',
+    '**/*.ts',
     '!src/**/*.test.ts',
     '!src/**/*.controller.ts',
     '!src/**/*.typeorm.ts',

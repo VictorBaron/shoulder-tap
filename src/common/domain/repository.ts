@@ -1,6 +1,6 @@
 import { EntityManager, EntityName, Primary } from '@mikro-orm/postgresql';
 import { EventBus } from '@nestjs/cqrs';
-import { PersistenceEntity } from 'src/common/persistence-entity';
+import { PersistenceEntity } from 'common/persistence-entity';
 
 import { AggregateRoot } from './aggregate-root';
 import { Mapper } from './mapper';

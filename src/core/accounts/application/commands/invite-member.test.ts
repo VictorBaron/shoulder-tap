@@ -1,20 +1,18 @@
 import { ConflictException, ForbiddenException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { MemberFactory } from 'src/core/accounts/__tests__/factories/member.factory';
+
+import { MemberFactory } from '@/accounts/__tests__/factories/member.factory';
 import {
   Member,
   MemberInvitedEvent,
   MemberJSON,
   MemberRepository,
-} from 'src/core/accounts/domain';
-import {
-  MemberRole,
-  MemberRoleLevel,
-} from 'src/core/accounts/domain/value-objects';
-import { InMemoryMemberRepository } from 'src/core/accounts/infrastructure/persistence/in-memory/in-memory-member.repository';
-import { UserFactory } from 'src/core/users/__tests__/factories/user.factory';
-import { Email, User, UserRepository } from 'src/core/users/domain';
-import { InMemoryUserRepository } from 'src/core/users/infrastructure/persistence/inmemory/user.repository.inmemory';
+} from '@/accounts/domain';
+import { MemberRole, MemberRoleLevel } from '@/accounts/domain/value-objects';
+import { InMemoryMemberRepository } from '@/accounts/infrastructure/persistence/in-memory/in-memory-member.repository';
+import { UserFactory } from '@/users/__tests__/factories/user.factory';
+import { Email, User, UserRepository } from '@/users/domain';
+import { InMemoryUserRepository } from '@/users/infrastructure/persistence/inmemory/user.repository.inmemory';
 
 import {
   InviteMemberCommand,

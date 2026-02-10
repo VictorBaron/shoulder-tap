@@ -1,9 +1,5 @@
-import {
-  Member,
-  MemberPreferences,
-  MemberRole,
-} from 'src/core/accounts/domain';
-import { MemberMikroOrm } from 'src/core/accounts/infrastructure/persistence/mikro-orm';
+import { Member, MemberPreferences, MemberRole } from '@/accounts/domain';
+import { MemberMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm';
 
 export class MemberMapper {
   static toDomain(raw: MemberMikroOrm): Member {

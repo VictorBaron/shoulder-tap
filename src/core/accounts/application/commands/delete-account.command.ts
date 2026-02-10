@@ -3,7 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { AccountRepository, Member } from 'src/core/accounts/domain';
+
+import { AccountRepository, Member } from '@/accounts/domain';
 
 export class DeleteAccountCommand {
   constructor(

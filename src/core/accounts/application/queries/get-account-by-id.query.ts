@@ -3,11 +3,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+
 import {
   Account,
   AccountRepository,
   MemberRepository,
-} from 'src/core/accounts/domain';
+} from '@/accounts/domain';
 
 export class GetAccountByIdQuery {
   constructor(

@@ -9,7 +9,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { type Request, type Response } from 'express';
-import { UserJSON } from 'src/core/users/domain';
+
+import { UserJSON } from '@/users/domain';
 
 import { AuthService } from './auth.service';
 import { CookieAuthGuard } from './cookie-auth.guard';

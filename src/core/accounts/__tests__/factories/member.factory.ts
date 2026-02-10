@@ -3,7 +3,7 @@ import {
   MemberPreferences,
   MemberProps,
   MemberRole,
-} from 'src/core/accounts/domain';
+} from '@/accounts/domain';
 
 export class MemberFactory {
   static create(overrides?: Partial<MemberProps>): Member {

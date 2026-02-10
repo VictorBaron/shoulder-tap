@@ -1,16 +1,14 @@
 import { ForbiddenException } from '@nestjs/common';
-import { AggregateRoot } from 'src/common/domain';
+import { AggregateRoot } from 'common/domain';
+
 import {
   MemberActivatedEvent,
   MemberDisabledEvent,
   MemberEnabledEvent,
   MemberInvitedEvent,
   MemberRoleChangedEvent,
-} from 'src/core/accounts/domain/events';
-import {
-  MemberPreferences,
-  MemberRole,
-} from 'src/core/accounts/domain/value-objects';
+} from '@/accounts/domain/events';
+import { MemberPreferences, MemberRole } from '@/accounts/domain/value-objects';
 
 import {
   CreateFounderMemberProps,

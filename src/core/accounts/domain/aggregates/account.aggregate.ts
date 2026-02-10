@@ -1,8 +1,9 @@
-import { AggregateRoot } from 'src/common/domain';
+import { AggregateRoot } from 'common/domain';
+
 import {
   AccountCreatedEvent,
   AccountUpdatedEvent,
-} from 'src/core/accounts/domain/events';
+} from '@/accounts/domain/events';
 
 import { AccountJSON, AccountProps, CreateAccountProps } from './account.types';
 

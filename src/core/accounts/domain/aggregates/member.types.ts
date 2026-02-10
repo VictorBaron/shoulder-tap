@@ -1,9 +1,10 @@
-import { AggregateRootProps } from 'src/common/domain';
+import { AggregateRootProps } from 'common/domain';
+
 import {
   MemberPreferences,
   MemberRole,
   MemberRoleLevel,
-} from 'src/core/accounts/domain/value-objects';
+} from '@/accounts/domain/value-objects';
 
 import { Member } from './member.aggregate';
 
