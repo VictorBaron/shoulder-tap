@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { App, ExpressReceiver } from '@slack/bolt';
 import { ConfigService } from '@nestjs/config';
+import { App, ExpressReceiver } from '@slack/bolt';
+
 import { isGenericMessage } from './types';
 
 @Injectable()
@@ -31,10 +32,15 @@ export class SlackService implements OnModuleInit {
       installationStore: {
         storeInstallation: async (installation) => {
           // TODO: Save to database in Phase 2
-          console.log('Installation:', installation);
+          await Promise.resolve(() => {
+            console.log('Installation:', installation);
+          });
         },
         fetchInstallation: async (installQuery) => {
           // TODO: Fetch from database in Phase 2
+          await Promise.resolve(() => {
+            console.log('InstallQuery:', installQuery);
+          });
           throw new Error('Not implemented');
         },
       },
@@ -54,21 +60,25 @@ export class SlackService implements OnModuleInit {
     this.bolt.event('message', async ({ event, context }) => {
       if (!isGenericMessage(event)) return;
 
-      console.log('Message received:', {
-        user: (event as { user: string }).user,
-        channel: event.channel,
-        text: (event as { text?: string }).text,
-        ts: event.ts,
-        userToken: context.userToken ? 'present' : 'missing',
+      await Promise.resolve(() => {
+        console.log('Message received:', {
+          user: (event as { user: string }).user,
+          channel: event.channel,
+          text: (event as { text?: string }).text,
+          ts: event.ts,
+          userToken: context.userToken ? 'present' : 'missing',
+        });
       });
     });
 
     this.bolt.event('reaction_added', async ({ event }) => {
-      console.log('Reaction added:', {
-        user: event.user,
-        reaction: event.reaction,
-        itemUser: event.item_user,
-      });
+      await Promise.resolve(() =>
+        console.log('Reaction added:', {
+          user: event.user,
+          reaction: event.reaction,
+          itemUser: event.item_user,
+        }),
+      );
     });
   }
 
