@@ -166,8 +166,58 @@ src/<module>/
 
 ### Testing
 
-- Unit tests for scoring logic, pre-filters, and batch/digest rules
-- Integration tests for OAuth flows and message pipeline
+**Strategy: 90% unit tests (Chicago school)**
+
+- Test the end result, not the interactions
+- Test aggregate properties and domain events inside aggregates
+- Every command use case MUST have tests
+- Run relevant tests after every change — a failing test that was passing before triggers extra caution
+
+**Unit Testing Approach:**
+
+- Use InMemory repositories for DB interactions
+  - InMemory implementations live in `src/<module>/infrastructure/persistence/in-memory-<entity>.repository.ts`
+  - They implement the same repository port interface as the real repository
+- Mock only when the dependency is:
+  - Non-deterministic (random, UUID generation)
+  - Slow (external HTTP calls, file I/O)
+  - External (Slack API, Google Calendar API, Claude API, queues, clock)
+- Focus on testing domain logic and command handlers, not infrastructure plumbing
+
+**Test Structure:**
+
+```typescript
+// Example: testing a command handler with InMemory repository
+describe('SendMessageCommand', () => {
+  let handler: SendMessageCommandHandler;
+  let messageRepository: InMemoryMessageRepository;
+  let slackGateway: jest.Mocked<SlackGateway>;
+
+  beforeEach(() => {
+    messageRepository = new InMemoryMessageRepository();
+    slackGateway = createMockSlackGateway();
+    handler = new SendMessageCommandHandler(messageRepository, slackGateway);
+  });
+
+  it('should mark message as urgent when score is 5', async () => {
+    // Test end result on the aggregate, not mock interactions
+    const result = await handler.execute(command);
+
+    const message = await messageRepository.findById(result.messageId);
+    expect(message.isUrgent()).toBe(true);
+    expect(message.getEvents()).toContainEqual(
+      expect.objectContaining({ type: 'MessageMarkedUrgent' })
+    );
+  });
+});
+```
+
+**Coverage Targets:**
+
+- All command handlers: 100%
+- Domain entities/aggregates: 100%
+- Pre-filter logic, scoring rules, batch/digest logic: 100%
+- Integration tests for OAuth flows and full message pipeline: critical paths only
 - Use a test Slack workspace — never test against production workspaces
 
 ### Error Handling
