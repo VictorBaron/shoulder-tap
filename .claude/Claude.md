@@ -122,14 +122,47 @@ Messages should be skipped (not scored) if:
 | 3–4     | Batched DM   | Flushed at next calendar break |
 | 1–2     | Daily digest | End of working hours           |
 
+### Hexagonal Architecture & DDD
+
+Every module follows this layered structure:
+
+```
+src/<module>/
+  domain/
+    <entity>.ts              # Domain entity/aggregate with business logic methods
+    <port>.repository.ts     # Repository port interface (abstract class or interface)
+    <port>.gateway.ts        # External API gateway port interface (if needed)
+  application/
+    commands/                # Command handlers (write operations)
+    queries/                 # Query handlers (read operations)
+  infrastructure/
+    persistence/
+      <entity>.mapper.ts     # Maps persistence model ↔ domain model
+      <entity>.repository.ts # Implements repository port using Prisma/ORM
+    gateways/                # Implements gateway ports (Slack, Google, Claude APIs)
+  <module>.module.ts         # NestJS module wiring — binds ports to adapters via DI
+```
+
+**Rules:**
+- Business logic belongs in domain entities/aggregates — NOT in services or handlers
+- Aggregates are fetched and saved as a whole unit via repositories
+- Domain entities are plain TS classes — never ORM/Prisma models
+- Repositories use mappers to convert between persistence and domain models
+- Mappers expose `toDomain()` and `toPersistence()` — pure functions, no side effects
+- All external I/O (DB, Slack API, Google Calendar API, Claude API) is behind a port interface
+- Port interfaces are defined in the domain layer; implementations live in infrastructure
+- Use NestJS DI to bind port interfaces to their infrastructure implementations
+- Application handlers orchestrate domain objects — they do not contain business logic
+- DTOs are for API input/output; domain models are for business logic; persistence models are for the DB
+
 ### Code Style
 
 - TypeScript strict mode
 - Use NestJS decorators and DI idiomatically — no manual instantiation
 - Prefer `async/await` over raw promises
 - Keep modules small and focused; one domain concept per module
-- Write services for business logic, controllers/listeners for I/O boundaries
-- Use DTOs for API inputs; entities for persistence
+- Controllers/listeners handle I/O boundaries only — delegate to command/query handlers
+- Use DTOs for API inputs; domain entities for business logic; persistence models for storage
 
 ### Testing
 
