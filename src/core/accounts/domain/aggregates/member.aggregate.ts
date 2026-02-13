@@ -111,7 +111,6 @@ export class Member extends AggregateRoot {
       return;
     }
     if (!actor.canInvite()) {
-      console.log(actor.toJSON());
       throw new ForbiddenException('Only active admins can invite new members');
     }
     if (actor.accountId !== this.accountId) {

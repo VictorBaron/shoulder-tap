@@ -25,7 +25,7 @@ export class AuthService {
     const user = await this.createUserHandler.execute(
       new CreateUserCommand({ email, password: hash }),
     );
-    return { id: user.getId(), email: user.getEmail().getValue() };
+    return { id: user.getId(), email: user.getEmail() };
   }
 
   async login(email: string, password: string) {
@@ -44,7 +44,7 @@ export class AuthService {
       token,
       user: {
         id: user.getId(),
-        email: user.getEmail().getValue(),
+        email: user.getEmail(),
         name: user.getName(),
       },
     };
@@ -53,7 +53,7 @@ export class AuthService {
   async generateToken(user: User) {
     return this.jwt.signAsync({
       sub: user.getId(),
-      email: user.getEmail().getValue(),
+      email: user.getEmail(),
       name: user.getName(),
     });
   }

@@ -10,7 +10,13 @@ It notifies you if it's urgent; or at the end of your focus time-blockers or mee
 
 ShoulderTap is a pnpm monorepo with a NestJS API backend and React frontend.
 Authentication is via Google OAuth.
-The back-end uses Ports and Adapters (Hexagonal) architecture, CQRS, and Domain Driven Design.
+
+### Architecture (MANDATORY)
+
+The back-end strictly follows **Hexagonal Architecture** and **Domain Driven Design**.
+Refer to these skills for guidance:
+- `.claude/skills/ddd/skill.md` — DDD patterns, aggregates, entities, value objects, repositories, mappers
+- `.claude/hexagonal-architecture.md` — Module structure and port/adapter constraints
 
 ### Hexagonal Architecture & DDD Rules
 

@@ -1,5 +1,6 @@
 import { Entity, Index, Property, Unique } from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
+import { OwnProperties } from 'common/types/misc';
 
 import { MemberRoleLevel } from '@/accounts/domain';
 
@@ -34,4 +35,8 @@ export class MemberMikroOrm extends PersistenceEntity {
 
   @Property({ type: 'jsonb' })
   preferences: Record<string, unknown>;
+
+  static build(props: OwnProperties<MemberMikroOrm>): MemberMikroOrm {
+    return Object.assign(new MemberMikroOrm(), props);
+  }
 }

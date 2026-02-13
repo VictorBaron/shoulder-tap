@@ -6,7 +6,7 @@ import type { Application } from 'express';
 import { SlackGateway } from '@/slack/domain/slack.gateway';
 import { isGenericMessage } from '@/slack/types';
 
-const SLACK_SCOPES = ['chat:write', 'users:read'] as const;
+const SLACK_SCOPES = ['chat:write', 'im:write', 'users:read'] as const;
 
 const USER_SCOPES = [
   'channels:history',

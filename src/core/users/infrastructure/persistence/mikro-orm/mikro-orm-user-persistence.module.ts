@@ -5,7 +5,7 @@ import { PersistenceModule } from 'common/persistence-module';
 import { UserRepository } from '@/users/domain';
 
 import { UserMikroOrm } from './models';
-import { UserRepositoryMikroOrm } from './user.repository.mikro-orm';
+import { UserRepositoryMikroOrm } from './user.repository.mikroORM';
 
 @Module({
   imports: [MikroOrmModule.forFeature([UserMikroOrm]), PersistenceModule],

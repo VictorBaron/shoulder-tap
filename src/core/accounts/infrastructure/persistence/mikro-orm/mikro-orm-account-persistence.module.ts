@@ -4,8 +4,8 @@ import { PersistenceModule } from 'common/persistence-module';
 
 import { AccountRepository, MemberRepository } from '@/accounts/domain';
 
-import { AccountRepositoryMikroOrm } from './account.repository.mikro-orm';
-import { MemberRepositoryMikroOrm } from './member.repository.mikro-orm';
+import { AccountRepositoryMikroOrm } from './account.repository.mikroORM';
+import { MemberRepositoryMikroOrm } from './member.repository.mikroORM';
 import { AccountMikroOrm, MemberMikroOrm } from './models';
 
 @Module({

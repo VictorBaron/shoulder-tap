@@ -4,6 +4,10 @@ module.exports = {
   roots: ['<rootDir>/src'],
   testMatch: ['**/*.test.ts'],
   moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/core/$1',
+    '^common/(.*)$': '<rootDir>/src/common/$1',
+    '^auth/(.*)$': '<rootDir>/src/auth/$1',
+    '^health/(.*)$': '<rootDir>/src/health/$1',
     '^src/(.*)$': '<rootDir>/src/$1',
   },
   transform: {

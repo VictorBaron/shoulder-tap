@@ -9,10 +9,10 @@ import {
   MemberRepository,
 } from '@/accounts/domain';
 import { MemberRole, MemberRoleLevel } from '@/accounts/domain/value-objects';
-import { InMemoryMemberRepository } from '@/accounts/infrastructure/persistence/in-memory/in-memory-member.repository';
+import { InMemoryMemberRepository } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
 import { UserFactory } from '@/users/__tests__/factories/user.factory';
 import { Email, User, UserRepository } from '@/users/domain';
-import { InMemoryUserRepository } from '@/users/infrastructure/persistence/inmemory/user.repository.inmemory';
+import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
 
 import {
   InviteMemberCommand,
@@ -22,7 +22,7 @@ import {
 describe('Invite member', () => {
   let handler: InviteMemberHandler;
   let memberRepository: InMemoryMemberRepository;
-  let userRepository: InMemoryUserRepository;
+  let userRepository: UserRepositoryInMemory;
 
   let inviter: Member;
 
@@ -33,14 +33,14 @@ describe('Invite member', () => {
       providers: [
         InviteMemberHandler,
         { provide: MemberRepository, useClass: InMemoryMemberRepository },
-        { provide: UserRepository, useClass: InMemoryUserRepository },
+        { provide: UserRepository, useClass: UserRepositoryInMemory },
       ],
     }).compile();
 
     handler = module.get<InviteMemberHandler>(InviteMemberHandler);
 
     memberRepository = module.get<InMemoryMemberRepository>(MemberRepository);
-    userRepository = module.get<InMemoryUserRepository>(UserRepository);
+    userRepository = module.get<UserRepositoryInMemory>(UserRepository);
 
     inviter = MemberFactory.createAdmin({
       id: 'inviterId',

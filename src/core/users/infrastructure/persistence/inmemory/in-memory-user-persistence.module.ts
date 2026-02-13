@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 
 import { UserRepository } from '@/users/domain';
 
-import { InMemoryUserRepository } from './user.repository.inmemory';
+import { UserRepositoryInMemory } from './user.repository.in-memory';
 
 @Module({
   providers: [
     {
       provide: UserRepository,
-      useClass: InMemoryUserRepository,
+      useClass: UserRepositoryInMemory,
     },
   ],
   exports: [UserRepository],

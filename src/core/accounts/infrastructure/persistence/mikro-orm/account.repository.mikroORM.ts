@@ -1,7 +1,7 @@
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
-import { Repository } from 'common/domain';
+import { RepositoryMikroORM } from 'common/domain';
 
 import { Account, AccountRepository } from '@/accounts/domain';
 
@@ -10,7 +10,7 @@ import { AccountMikroOrm } from './models';
 
 @Injectable()
 export class AccountRepositoryMikroOrm
-  extends Repository<Account, AccountMikroOrm>
+  extends RepositoryMikroORM<Account, AccountMikroOrm>
   implements AccountRepository
 {
   constructor(em: EntityManager, eventBus: EventBus) {
