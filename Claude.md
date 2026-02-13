@@ -1,5 +1,16 @@
 # ShoulderTap - Project Context
 
+## Workflow Rules
+
+### Test-First Development (MANDATORY)
+
+When implementing any feature or change:
+
+1. **Write behavioral tests FIRST** — Before writing any production code, write tests that describe the expected behavior using BDD-style descriptions (`should ...`).
+2. **Use the test-writer agent** — Always delegate test writing to `@.claude/agents/test-writer`.
+3. **Get user review on tests** — After writing the tests, STOP and present them to the user for review. Do NOT proceed with implementation until the user approves the tests.
+4. **Then implement** — Only after test approval, write the production code to make the tests pass.
+
 ## Purpose
 
 This project is named ShoulderTap.
@@ -49,6 +60,7 @@ These rules apply to ALL backend code. Follow them strictly.
 - Every external API call goes through a gateway interface — never call Slack/Google/Claude APIs directly from application or domain layer
 - Domain models and persistence models are separate classes — always use mappers to convert between them
 - Aggregates enforce their own invariants — validation logic belongs on the aggregate, not in the service
+- **Dependency injection is mandatory** for all services/repositories that access external systems (database, Slack API, Google Calendar API, Claude API, etc.) — define port interfaces in domain, inject implementations via NestJS DI
 
 ## Commands
 

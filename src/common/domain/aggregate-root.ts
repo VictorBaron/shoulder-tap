@@ -19,7 +19,7 @@ export abstract class AggregateRoot<
     this.domainEvents.push(...events);
   }
 
-  public findEvents<T extends object>(
+  public findEvents<T extends IDomainEvent>(
     eventType: new (...args: any[]) => T,
   ): Array<T> {
     return this.domainEvents

@@ -60,13 +60,51 @@ Follow the project's testing framework conventions.
 
 ```typescript
 describe("Use case", () => {
-  (describe("specific scenario or condition", () => {
-    it("should [expected behavior]", () => {
-      const input = createTestInput();
+  let handler: MyCommandHandler;
+  let memberRepository: InMemoryMemberRepository;
+  let member: Member;
 
+  beforeEach(async () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-01-01'));
+
+    const module = await Test.createTestingModule({
+      providers: [
+        MyCommandHandler,
+        { provide: MemberRepository, useClass: InMemoryMemberRepository },
+      ],
+    }).compile();
+
+    handler = module.get<MyCommandHandler>(MyCommandHandler);
+    memberRepository = module.get<InMemoryMemberRepository>(MemberRepository);
+
+    member = MemberFactory.createAdmin({
+      id: 'memberId',
+      userId: 'userId',
+    });
+
+    memberRepository.clear();
+    userRepository.clear();
+    await memberRepository.save(inviter);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  describe("specific scenario or condition", () => {
+    it("should [expected behavior]", () => {
+      const command = new MyCommand({});
       const result = usecase.exec(input);
 
-      expect(result).toEqual(expectedOutput);
+      const savedMember = await memberRepository.findById(member.id)
+
+      expect(savedMember?.toJSON()).toMatchObject<Partial<MemberJSON>>({
+        accountId: 'accountId',
+        invitedById: 'inviterId',
+        role: MemberRoleLevel.USER,
+        userId: savedUser?.id,
+      });
+      expect(savedMember?.findEvents(MemberInvitedEvent)).toHaveLength(1);
     });
   }),
     describe("invalid condition", () => {
@@ -75,7 +113,7 @@ describe("Use case", () => {
 
         expect(() => usecase.exec(invalidInput)).toThrow(ExpectedError);
       });
-    }));
+    });
 });
 ```
 
@@ -106,3 +144,5 @@ describe("Feature Integration", () => {
 - Keep tests fast (< 100ms for unit tests)
 - Don't test methods, test the whole use case behavior
 - Use InMemory repositories for unit tests.
+- Always test the actually saved data in the repository
+- Check events in the aggregate, if any should have been sent
