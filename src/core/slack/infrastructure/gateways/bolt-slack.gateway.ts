@@ -37,6 +37,7 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
       clientSecret: this.config.get('SLACK_CLIENT_SECRET'),
       stateSecret: this.config.getOrThrow('SLACK_STATE_SECRET'),
       scopes: [...SLACK_SCOPES],
+      endpoints: { events: '/events' },
       installerOptions: {
         userScopes: [...USER_SCOPES],
         installPath: '/install',
