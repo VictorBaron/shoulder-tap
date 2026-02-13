@@ -11,7 +11,7 @@
     }
   },
   "oauth_config": {
-    "redirect_urls": ["https://your-domain.com/slack/oauth/callback"],
+    "redirect_urls": ["https://localhost:3000/slack/oauth/callback"],
     "scopes": {
       "bot": ["chat:write", "im:write", "users:read"],
       "user": [
@@ -30,7 +30,7 @@
   },
   "settings": {
     "event_subscriptions": {
-      "request_url": "https://your-domain.com/slack/events",
+      "request_url": "https://localhost:3000/slack/events",
       "user_events": [
         "message.channels",
         "message.groups",
@@ -41,7 +41,7 @@
     },
     "interactivity": {
       "is_enabled": true,
-      "request_url": "https://your-domain.com/slack/events"
+      "request_url": "https://localhost:3000/slack/events"
     },
     "socket_mode_enabled": false
   }

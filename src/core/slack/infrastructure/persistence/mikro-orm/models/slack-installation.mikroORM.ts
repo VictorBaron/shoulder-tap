@@ -1,6 +1,6 @@
 import { Entity, Index, Property, Unique } from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
-import { OwnProperties } from 'common/types/misc';
+import { OwnPersistenceEntityProperties } from 'common/types/misc';
 
 @Entity({ tableName: 'slack_installation' })
 @Unique({ properties: ['teamId', 'enterpriseId'] })
@@ -48,7 +48,7 @@ export class SlackInstallationMikroOrm extends PersistenceEntity {
   installedAt: Date;
 
   static build(
-    props: OwnProperties<SlackInstallationMikroOrm>,
+    props: OwnPersistenceEntityProperties<SlackInstallationMikroOrm>,
   ): SlackInstallationMikroOrm {
     return Object.assign(new SlackInstallationMikroOrm(), props);
   }

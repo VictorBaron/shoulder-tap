@@ -1,9 +1,10 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { App, ExpressReceiver } from '@slack/bolt';
+import { App, ExpressReceiver, type InstallationStore } from '@slack/bolt';
 import type { Application } from 'express';
 
 import { SlackGateway } from '@/slack/domain/slack.gateway';
+import { INSTALLATION_STORE } from '@/slack/infrastructure/persistence/installation-store.token';
 import { isGenericMessage } from '@/slack/types';
 
 const SLACK_SCOPES = ['chat:write', 'im:write', 'users:read'] as const;
@@ -25,7 +26,11 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
   private bolt: App;
   private receiver: ExpressReceiver;
 
-  constructor(private config: ConfigService) {
+  constructor(
+    private config: ConfigService,
+    @Inject(INSTALLATION_STORE)
+    private installationStore: InstallationStore,
+  ) {
     this.receiver = new ExpressReceiver({
       signingSecret: this.config.getOrThrow('SLACK_SIGNING_SECRET'),
       clientId: this.config.get('SLACK_CLIENT_ID'),
@@ -34,18 +39,11 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
       scopes: [...SLACK_SCOPES],
       installerOptions: {
         userScopes: [...USER_SCOPES],
+        installPath: '/install',
+        redirectUriPath: '/oauth/callback',
       },
-      installationStore: {
-        storeInstallation: async (installation) => {
-          // TODO: Save to database in Phase 2
-          await Promise.resolve(console.log('Installation:', installation));
-        },
-        fetchInstallation: async (installQuery) => {
-          // TODO: Fetch from database in Phase 2
-          await Promise.resolve(console.log('InstallQuery:', installQuery));
-          throw new Error('Not implemented');
-        },
-      },
+      installationStore: this.installationStore,
+      redirectUri: `${this.config.getOrThrow('SLACK_REDIRECT_URI')}/slack/oauth/callback`,
     });
 
     this.bolt = new App({ receiver: this.receiver });

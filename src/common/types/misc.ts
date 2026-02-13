@@ -24,3 +24,11 @@ export type OwnProperties<E extends PersistenceEntity> = Omit<
   E,
   RelationKeys<E> | keyof PersistenceEntity | ReadonlyKeys<E>
 >;
+
+export type OwnPersistenceEntityProperties<E extends PersistenceEntity> =
+  OwnProperties<E> & {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date | null;
+  };

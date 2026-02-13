@@ -31,21 +31,25 @@ export class SlackInstallationMapper {
     slackInstallation: SlackInstallation,
   ): SlackInstallationMikroOrm {
     const json = slackInstallation.toJSON();
-    const entity = new SlackInstallationMikroOrm();
-    entity.id = json.id;
-    entity.teamId = json.teamId;
-    entity.teamName = json.teamName;
-    entity.enterpriseId = json.enterpriseId;
-    entity.enterpriseName = json.enterpriseName;
-    entity.userId = json.userId;
-    entity.botToken = json.botToken;
-    entity.userToken = json.userToken;
-    entity.botId = json.botId;
-    entity.botUserId = json.botUserId;
-    entity.tokenType = json.tokenType;
-    entity.isEnterpriseInstall = json.isEnterpriseInstall;
-    entity.rawInstallation = json.rawInstallation;
-    entity.installedAt = json.installedAt;
+    const entity = SlackInstallationMikroOrm.build({
+      id: json.id,
+      teamId: json.teamId,
+      teamName: json.teamName,
+      enterpriseId: json.enterpriseId,
+      enterpriseName: json.enterpriseName,
+      userId: json.userId,
+      botToken: json.botToken,
+      userToken: json.userToken,
+      botId: json.botId,
+      botUserId: json.botUserId,
+      tokenType: json.tokenType,
+      isEnterpriseInstall: json.isEnterpriseInstall,
+      rawInstallation: json.rawInstallation,
+      installedAt: json.installedAt,
+      createdAt: json.createdAt,
+      updatedAt: json.updatedAt,
+      deletedAt: json.deletedAt,
+    });
     return entity;
   }
 
