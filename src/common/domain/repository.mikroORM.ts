@@ -22,7 +22,7 @@ export class RepositoryMikroORM<
 
   async save(aggregate: Aggregate): Promise<void> {
     const entity = this.mapper.toPersistence(aggregate);
-    this.em.persist(entity);
+    await this.em.upsert(this.entityName, entity);
     await this.em.flush();
     aggregate.publishEvents(this.eventBus);
   }
@@ -31,7 +31,7 @@ export class RepositoryMikroORM<
     const entities = aggregates.map((aggregate) =>
       this.mapper.toPersistence(aggregate),
     );
-    this.em.persist(entities);
+    await this.em.upsertMany(this.entityName, entities);
     await this.em.flush();
 
     aggregates.forEach((aggregate) => aggregate.publishEvents(this.eventBus));
