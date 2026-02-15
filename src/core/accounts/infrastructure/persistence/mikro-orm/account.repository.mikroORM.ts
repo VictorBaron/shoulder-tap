@@ -22,6 +22,13 @@ export class AccountRepositoryMikroOrm
     return entity ? AccountMapper.toDomain(entity) : null;
   }
 
+  async findBySlackTeamId(teamId: string): Promise<Account | null> {
+    const entity = await this.em.findOne(AccountMikroOrm, {
+      slackTeamId: teamId,
+    });
+    return entity ? AccountMapper.toDomain(entity) : null;
+  }
+
   async findAll(): Promise<Account[]> {
     const entities = await this.em.find(
       AccountMikroOrm,

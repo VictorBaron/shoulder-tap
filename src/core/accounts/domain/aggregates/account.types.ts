@@ -1,17 +1,16 @@
-import { AggregateRootProps } from 'common/domain';
+import { AggregateRootJSON, AggregateRootProps } from 'common/domain';
 
 export interface AccountProps extends AggregateRootProps {
   name: string;
+  slackTeamId: string;
 }
 
 export interface CreateAccountProps {
   name: string;
+  slackTeamId: string;
 }
 
-export interface AccountJSON {
-  id: string;
+export interface AccountJSON extends AggregateRootJSON {
   name: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
+  slackTeamId: string;
 }

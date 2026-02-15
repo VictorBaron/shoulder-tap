@@ -57,12 +57,6 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
     });
 
     this.bolt = new App({ receiver: this.receiver });
-
-    this.bolt.use(async ({ body, next }) => {
-      // You should see `type: "events_api"` envelopes and inside them `event.type`
-      console.log('INCOMING:', JSON.stringify(body, null, 2));
-      await next();
-    });
   }
 
   onModuleInit() {

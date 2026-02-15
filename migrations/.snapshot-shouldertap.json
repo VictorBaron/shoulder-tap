@@ -54,6 +54,16 @@
           "nullable": false,
           "length": 255,
           "mappedType": "string"
+        },
+        "slack_team_id": {
+          "name": "slack_team_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
         }
       },
       "name": "account",
@@ -61,10 +71,10 @@
       "indexes": [
         {
           "columnNames": [
-            "name"
+            "slack_team_id"
           ],
           "composite": false,
-          "keyName": "account_name_unique",
+          "keyName": "account_slack_team_id_unique",
           "constraint": true,
           "primary": false,
           "unique": true

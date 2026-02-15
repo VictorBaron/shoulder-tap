@@ -9,6 +9,7 @@ import { AccountJSON, AccountProps, CreateAccountProps } from './account.types';
 
 export class Account extends AggregateRoot {
   private name: string;
+  private slackTeamId: string;
 
   private constructor(props: AccountProps) {
     super({
@@ -18,6 +19,7 @@ export class Account extends AggregateRoot {
       deletedAt: props.deletedAt,
     });
     this.name = props.name;
+    this.slackTeamId = props.slackTeamId;
   }
 
   static create(props: CreateAccountProps): Account {
@@ -26,6 +28,7 @@ export class Account extends AggregateRoot {
     const account = new Account({
       id: crypto.randomUUID(),
       name: props.name,
+      slackTeamId: props.slackTeamId,
       createdAt: now,
       updatedAt: now,
       deletedAt: null,
@@ -63,6 +66,7 @@ export class Account extends AggregateRoot {
     return {
       id: this.id,
       name: this.name,
+      slackTeamId: this.slackTeamId,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       deletedAt: this.deletedAt,

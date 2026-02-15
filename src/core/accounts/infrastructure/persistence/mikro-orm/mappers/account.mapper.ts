@@ -6,6 +6,7 @@ export class AccountMapper {
     return Account.reconstitute({
       id: raw.id,
       name: raw.name,
+      slackTeamId: raw.slackTeamId,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
       deletedAt: raw.deletedAt,
@@ -14,12 +15,10 @@ export class AccountMapper {
 
   static toPersistence(account: Account): AccountMikroOrm {
     const json = account.toJSON();
-    const entity = new AccountMikroOrm();
-    entity.id = json.id;
-    entity.name = json.name;
-    entity.createdAt = json.createdAt;
-    entity.updatedAt = json.updatedAt;
-    entity.deletedAt = json.deletedAt;
+    const entity = AccountMikroOrm.build({
+      ...json,
+    });
+
     return entity;
   }
 }
