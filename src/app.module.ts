@@ -4,6 +4,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 
+import { FilteringModule } from '@/filtering/filtering.module';
+
 import { AccountMikroOrm } from './core/accounts/infrastructure/persistence/mikro-orm/models/account.mikroORM';
 import { MemberMikroOrm } from './core/accounts/infrastructure/persistence/mikro-orm/models/member.mikroORM';
 import { SlackInstallationMikroOrm } from './core/slack/infrastructure/persistence/mikro-orm/models/slack-installation.mikroORM';
@@ -29,6 +31,7 @@ import { UserMikroOrm } from './core/users/infrastructure/persistence/mikro-orm/
       inject: [ConfigService],
     }),
     SlackModule,
+    FilteringModule,
   ],
 })
 export class AppModule {}

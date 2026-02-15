@@ -1,13 +1,20 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { CommandBus } from '@nestjs/cqrs';
 import { App, ExpressReceiver, type InstallationStore } from '@slack/bolt';
 import type { Application } from 'express';
 
+import { FilterIncomingMessageCommand } from '@/filtering/application/commands/filter-incoming-message.command';
 import { SlackGateway } from '@/slack/domain/slack.gateway';
 import { INSTALLATION_STORE } from '@/slack/infrastructure/persistence/installation-store.token';
 import { isGenericMessage } from '@/slack/types';
 
-const SLACK_SCOPES = ['chat:write', 'im:write', 'users:read'] as const;
+const SLACK_SCOPES = [
+  'chat:write',
+  'im:write',
+  'users:read',
+  'reactions:read',
+] as const;
 
 const USER_SCOPES = [
   'channels:history',
@@ -19,6 +26,7 @@ const USER_SCOPES = [
   'im:read',
   'mpim:read',
   'users:read',
+  'reactions:read',
 ] as const;
 
 @Injectable()
@@ -28,6 +36,7 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
 
   constructor(
     private config: ConfigService,
+    private commandBus: CommandBus,
     @Inject(INSTALLATION_STORE)
     private installationStore: InstallationStore,
   ) {
@@ -48,6 +57,12 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
     });
 
     this.bolt = new App({ receiver: this.receiver });
+
+    this.bolt.use(async ({ body, next }) => {
+      // You should see `type: "events_api"` envelopes and inside them `event.type`
+      console.log('INCOMING:', JSON.stringify(body, null, 2));
+      await next();
+    });
   }
 
   onModuleInit() {
@@ -59,21 +74,16 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
   }
 
   private registerEventHandlers() {
-    this.bolt.event('message', async ({ event, context }) => {
+    this.bolt.event('message', async ({ event }) => {
       if (!isGenericMessage(event)) return;
 
-      await Promise.resolve(
-        console.log('Message received:', {
-          user: (event as { user: string }).user,
-          channel: event.channel,
-          text: (event as { text?: string }).text,
-          ts: event.ts,
-          userToken: context.userToken ? 'present' : 'missing',
-        }),
+      await this.commandBus.execute(
+        new FilterIncomingMessageCommand({ message: event }),
       );
     });
 
     this.bolt.event('reaction_added', async ({ event }) => {
+      console.log(event);
       await Promise.resolve(
         console.log('Reaction added:', {
           user: event.user,
