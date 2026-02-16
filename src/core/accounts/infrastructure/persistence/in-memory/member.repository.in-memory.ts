@@ -1,6 +1,6 @@
 import { RepositoryInMemory } from 'common/domain/repository.in-memory';
 
-import type { Member, MemberRepository } from '@/accounts/domain';
+import { Member, MemberRepository } from '@/accounts/domain';
 
 export class InMemoryMemberRepository
   extends RepositoryInMemory<Member>

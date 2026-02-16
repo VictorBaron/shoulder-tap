@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import type { AccountRepository, Member } from '@/accounts/domain';
+import { AccountRepository, Member } from '@/accounts/domain';
 
 export class DeleteAccountCommand {
   constructor(

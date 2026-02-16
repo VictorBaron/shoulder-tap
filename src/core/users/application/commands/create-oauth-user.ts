@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { User, type UserRepository } from '@/users/domain';
+import { User, UserRepository } from '@/users/domain';
 
 export class CreateOAuthUserCommand {
   constructor(

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import {
   type Profile,
@@ -9,14 +9,14 @@ import {
 
 import {
   CreateOAuthUserCommand,
-  type CreateOAuthUserHandler,
+  CreateOAuthUserHandler,
   LinkGoogleAccountCommand,
-  type LinkGoogleAccountHandler,
+  LinkGoogleAccountHandler,
 } from '@/users/application/commands';
 import {
-  type GetUserByEmailHandler,
+  GetUserByEmailHandler,
   GetUserByEmailQuery,
-  type GetUserByGoogleIdHandler,
+  GetUserByGoogleIdHandler,
   GetUserByGoogleIdQuery,
 } from '@/users/application/queries';
 

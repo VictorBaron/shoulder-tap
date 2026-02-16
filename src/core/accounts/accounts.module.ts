@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from 'auth/auth.module';
 
+import { ChannelsModule } from '@/channels/channels.module';
 import { UserPersistenceModule } from '@/users/infrastructure';
 
 import { AccountsController } from './accounts.controller';
@@ -31,6 +32,7 @@ import { InvitationsController, MembersController } from './members.controller';
     AuthModule,
     AccountPersistenceModule.use('orm'),
     UserPersistenceModule.use('orm'),
+    ChannelsModule,
   ],
   controllers: [AccountsController, MembersController, InvitationsController],
   providers: [

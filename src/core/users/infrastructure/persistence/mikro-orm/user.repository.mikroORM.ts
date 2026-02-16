@@ -1,9 +1,9 @@
-import type { EntityManager } from '@mikro-orm/postgresql';
+import { EntityManager } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
-import type { EventBus } from '@nestjs/cqrs';
+import { EventBus } from '@nestjs/cqrs';
 import { RepositoryMikroORM } from 'common/domain';
 
-import type { User, UserRepository } from '@/users/domain';
+import { User, UserRepository } from '@/users/domain';
 
 import { UserMapper } from './mappers';
 import { UserMikroOrm } from './models';

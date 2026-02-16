@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import type { User, UserRepository } from '@/users/domain';
+import { User, UserRepository } from '@/users/domain';
 
 export class LinkGoogleAccountCommand {
   constructor(

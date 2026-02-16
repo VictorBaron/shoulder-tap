@@ -1,7 +1,8 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Module } from '@nestjs/common';
 
-import { AccountsModule } from '@/accounts/accounts.module';
+import { AccountPersistenceModule } from '@/accounts/infrastructure/persistence/account-persistence.module';
+import { UserPersistenceModule } from '@/users/infrastructure';
 
 import { SLACK_GATEWAY } from './domain/slack.gateway';
 import { SlackInstallationRepository } from './domain/slack-installation.repository';
@@ -14,7 +15,8 @@ import { SlackInstallationStore } from './infrastructure/persistence/slack-insta
 @Module({
   imports: [
     MikroOrmModule.forFeature([SlackInstallationMikroOrm]),
-    AccountsModule,
+    AccountPersistenceModule.use('orm'),
+    UserPersistenceModule.use('orm'),
   ],
   providers: [
     {

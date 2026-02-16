@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260213163303 extends Migration {
+export class Migration20260213163303_Init extends Migration {
   override up(): void {
     this.addSql(
       `create table "account" ("id" uuid not null, "created_at" timestamptz not null, "updated_at" timestamptz not null, "deleted_at" timestamptz null, "name" varchar(255) not null, constraint "account_pkey" primary key ("id"));`,

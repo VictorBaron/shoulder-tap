@@ -14,23 +14,23 @@ import type { Request } from 'express';
 
 import {
   AcceptInvitationCommand,
-  type AcceptInvitationHandler,
+  AcceptInvitationHandler,
   ChangeMemberRoleCommand,
-  type ChangeMemberRoleHandler,
+  ChangeMemberRoleHandler,
   DisableMemberCommand,
-  type DisableMemberHandler,
+  DisableMemberHandler,
   EnableMemberCommand,
-  type EnableMemberHandler,
+  EnableMemberHandler,
   InviteMemberCommand,
-  type InviteMemberHandler,
+  InviteMemberHandler,
 } from './application/commands';
 import {
-  type GetAccountMembersHandler,
+  GetAccountMembersHandler,
   GetAccountMembersQuery,
-  type GetPendingInvitationsHandler,
+  GetPendingInvitationsHandler,
   GetPendingInvitationsQuery,
 } from './application/queries';
-import type { AccountRepository, Member, MemberRepository } from './domain';
+import { AccountRepository, Member, MemberRepository } from './domain';
 import type {
   ChangeMemberRoleDto,
   InvitationResponseDTO,

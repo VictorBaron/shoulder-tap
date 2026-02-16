@@ -7,12 +7,12 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import type { Request, Response } from 'express';
 
 import type { UserJSON } from '@/users/domain';
 
-import type { AuthService } from './auth.service';
+import { AuthService } from './auth.service';
 import { CookieAuthGuard } from './cookie-auth.guard';
 import type { LoginDto } from './dto';
 import { GoogleAuthGuard } from './google-auth.guard';

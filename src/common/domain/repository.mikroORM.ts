@@ -1,10 +1,14 @@
-import type { EntityManager, EntityName, Primary } from '@mikro-orm/postgresql';
-import type { EventBus } from '@nestjs/cqrs';
+import {
+  EntityManager,
+  type EntityName,
+  type Primary,
+} from '@mikro-orm/postgresql';
+import { EventBus } from '@nestjs/cqrs';
 import type { PersistenceEntity } from 'common/persistence-entity';
 
 import type { AggregateRoot } from './aggregate-root';
 import type { SoftDeletableEntityProps } from './entity';
-import type { Mapper } from './mapper';
+import { Mapper } from './mapper';
 
 export class RepositoryMikroORM<
   Aggregate extends AggregateRoot<SoftDeletableEntityProps>,

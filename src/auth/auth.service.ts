@@ -1,13 +1,13 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import type { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 
 import {
   CreateUserCommand,
-  type CreateUserHandler,
+  CreateUserHandler,
 } from '@/users/application/commands';
 import {
-  type GetUserByEmailHandler,
+  GetUserByEmailHandler,
   GetUserByEmailQuery,
 } from '@/users/application/queries';
 import type { User, UserJSON } from '@/users/domain';

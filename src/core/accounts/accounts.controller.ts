@@ -14,17 +14,17 @@ import type { Request } from 'express';
 
 import {
   CreateAccountCommand,
-  type CreateAccountHandler,
+  CreateAccountHandler,
   UpdateAccountCommand,
-  type UpdateAccountHandler,
+  UpdateAccountHandler,
 } from './application/commands';
 import {
-  type GetAccountByIdHandler,
+  GetAccountByIdHandler,
   GetAccountByIdQuery,
-  type GetUserAccountsHandler,
+  GetUserAccountsHandler,
   GetUserAccountsQuery,
 } from './application/queries';
-import type { Account, Member, MemberRepository } from './domain';
+import { Account, Member, MemberRepository } from './domain';
 import type {
   AccountResponseDTO,
   CreateAccountDto,

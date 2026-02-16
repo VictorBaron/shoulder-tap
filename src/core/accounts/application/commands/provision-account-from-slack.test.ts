@@ -1,16 +1,22 @@
 import { Test } from '@nestjs/testing';
 
+// biome-ignore lint/style/useImportType: needed for NestJS DI
 import { AccountFactory } from '@/accounts/__tests__/factories/account.factory';
+import { MemberFactory } from '@/accounts/__tests__/factories/member.factory';
 import { AccountRepository, MemberRepository } from '@/accounts/domain';
 import {
   SLACK_USERS_GATEWAY,
   type SlackUserInfo,
 } from '@/accounts/domain/gateways/slack-users.gateway';
-import { MemberRoleLevel } from '@/accounts/domain/value-objects';
+import { MemberRole, MemberRoleLevel } from '@/accounts/domain/value-objects';
 import { FakeSlackUsersGateway } from '@/accounts/infrastructure/gateways/fake-slack-users.gateway';
 import { AccountRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/account.repository.in-memory';
 import { InMemoryMemberRepository } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
-import { UserRepository } from '@/users/domain';
+import { ChannelRepository } from '@/channels/domain';
+import { SLACK_CHANNELS_GATEWAY } from '@/channels/domain/gateways/slack-channels.gateway';
+import { FakeSlackChannelsGateway } from '@/channels/infrastructure/gateways/fake-slack-channels.gateway';
+import { ChannelRepositoryInMemory } from '@/channels/infrastructure/persistence/in-memory/channel.repository.in-memory';
+import { Email, User, UserRepository } from '@/users/domain';
 import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
 
 import {
@@ -41,7 +47,9 @@ describe('Provision Account From Slack', () => {
         { provide: AccountRepository, useClass: AccountRepositoryInMemory },
         { provide: MemberRepository, useClass: InMemoryMemberRepository },
         { provide: UserRepository, useClass: UserRepositoryInMemory },
+        { provide: ChannelRepository, useClass: ChannelRepositoryInMemory },
         { provide: SLACK_USERS_GATEWAY, useClass: FakeSlackUsersGateway },
+        { provide: SLACK_CHANNELS_GATEWAY, useClass: FakeSlackChannelsGateway },
       ],
     }).compile();
 
@@ -297,7 +305,7 @@ describe('Provision Account From Slack', () => {
   });
 
   describe('when the account already exists for this teamId', () => {
-    it('should skip provisioning entirely', async () => {
+    it('should reuse the existing account and not create a duplicate', async () => {
       const existingAccount = AccountFactory.create({
         slackTeamId: 'T_ACME',
       });
@@ -314,6 +322,138 @@ describe('Provision Account From Slack', () => {
 
       const accounts = await accountRepository.findAll();
       expect(accounts).toHaveLength(1);
+      expect(accounts[0].getId()).toBe(existingAccount.getId());
+    });
+
+    it('should import new users that do not exist yet', async () => {
+      const existingAccount = AccountFactory.create({
+        slackTeamId: 'T_ACME',
+      });
+      await accountRepository.save(existingAccount);
+
+      slackUsersGateway.setUsers([
+        makeSlackUser({
+          slackId: 'U_NEW',
+          email: 'newuser@example.com',
+          name: 'New User',
+        }),
+      ]);
+
+      const command = new ProvisionAccountFromSlackCommand({
+        teamId: 'T_ACME',
+        teamName: 'Acme Corp',
+        botToken: 'xoxb-token',
+        installerSlackUserId: 'U_INSTALLER',
+      });
+
+      await handler.execute(command);
+
+      const newUser = await userRepository.findBySlackId('U_NEW');
+      expect(newUser).not.toBeNull();
+
+      const members = await memberRepository.findByAccountId(
+        existingAccount.getId(),
+      );
+      const newMember = members.find(
+        (m) => m.toJSON().userId === newUser!.getId(),
+      );
+      expect(newMember).toBeDefined();
+      expect(newMember?.toJSON()).toMatchObject({
+        accountId: existingAccount.getId(),
+        userId: newUser!.getId(),
+        role: MemberRoleLevel.USER,
+      });
+    });
+
+    it('should skip creating a member for a user who is already a member', async () => {
+      const existingAccount = AccountFactory.create({
+        slackTeamId: 'T_ACME',
+      });
+      await accountRepository.save(existingAccount);
+
+      const existingUser = User.createFromSlack({
+        slackId: 'U_EXISTING',
+        email: 'existing@example.com',
+        name: 'Existing User',
+      });
+      await userRepository.save(existingUser);
+
+      const existingMember = MemberFactory.create({
+        accountId: existingAccount.getId(),
+        userId: existingUser.getId(),
+      });
+      await memberRepository.save(existingMember);
+
+      slackUsersGateway.setUsers([
+        makeSlackUser({
+          slackId: 'U_EXISTING',
+          email: 'existing@example.com',
+          name: 'Existing User',
+        }),
+      ]);
+
+      const command = new ProvisionAccountFromSlackCommand({
+        teamId: 'T_ACME',
+        teamName: 'Acme Corp',
+        botToken: 'xoxb-token',
+        installerSlackUserId: 'U_INSTALLER',
+      });
+
+      await handler.execute(command);
+
+      const members = await memberRepository.findByAccountId(
+        existingAccount.getId(),
+      );
+      const membersForUser = members.filter(
+        (m) => m.toJSON().userId === existingUser.getId(),
+      );
+      expect(membersForUser).toHaveLength(1);
+    });
+
+    it('should preserve existing member roles when re-importing', async () => {
+      const existingAccount = AccountFactory.create({
+        slackTeamId: 'T_ACME',
+      });
+      await accountRepository.save(existingAccount);
+
+      const adminUser = User.createFromSlack({
+        slackId: 'U_ADMIN',
+        email: 'admin@example.com',
+        name: 'Admin User',
+      });
+      await userRepository.save(adminUser);
+
+      const adminMember = MemberFactory.createAdmin({
+        accountId: existingAccount.getId(),
+        userId: adminUser.getId(),
+        role: MemberRole.admin,
+      });
+      await memberRepository.save(adminMember);
+
+      slackUsersGateway.setUsers([
+        makeSlackUser({
+          slackId: 'U_ADMIN',
+          email: 'admin@example.com',
+          name: 'Admin User',
+        }),
+      ]);
+
+      const command = new ProvisionAccountFromSlackCommand({
+        teamId: 'T_ACME',
+        teamName: 'Acme Corp',
+        botToken: 'xoxb-token',
+        installerSlackUserId: 'U_INSTALLER',
+      });
+
+      await handler.execute(command);
+
+      const savedMember = await memberRepository.findByAccountIdAndUserId({
+        accountId: existingAccount.getId(),
+        userId: adminUser.getId(),
+      });
+      expect(savedMember?.toJSON()).toMatchObject({
+        role: MemberRoleLevel.ADMIN,
+      });
     });
   });
 });

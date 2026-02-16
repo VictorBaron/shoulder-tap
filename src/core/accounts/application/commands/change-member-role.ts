@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import {
   type Member,
-  type MemberRepository,
+  MemberRepository,
   MemberRole,
   type MemberRoleLevel,
 } from '@/accounts/domain';

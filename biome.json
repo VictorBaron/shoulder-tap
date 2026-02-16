@@ -83,7 +83,7 @@
         "useBlockStatements": "off",
         "useConsistentArrowReturn": "off",
         "useExportType": "error",
-        "useImportType": "error"
+        "useImportType": "off"
       },
       "suspicious": {
         "noAssignInExpressions": "error",

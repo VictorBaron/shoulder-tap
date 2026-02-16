@@ -1,3 +1,3 @@
-export * from './create-oauth-user.command';
-export * from './create-user.command';
-export * from './link-google-account.command';
+export * from './create-oauth-user';
+export * from './create-user';
+export * from './link-google-account';
