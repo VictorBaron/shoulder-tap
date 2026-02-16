@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 
 import {
   Account,
-  AccountRepository,
+  type AccountRepository,
   Member,
-  MemberRepository,
+  type MemberRepository,
 } from '@/accounts/domain';
 
 export class CreateAccountCommand {

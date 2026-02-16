@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { Member, MemberRepository } from '@/accounts/domain';
+import type { Member, MemberRepository } from '@/accounts/domain';
 
 export class GetAccountMembersQuery {
   constructor(

@@ -1,12 +1,12 @@
-import { AggregateRootProps } from 'common/domain';
+import type { AggregateRootProps } from 'common/domain';
 
-import {
+import type {
   MemberPreferences,
   MemberRole,
   MemberRoleLevel,
 } from '@/accounts/domain/value-objects';
 
-import { Member } from './member.aggregate';
+import type { Member } from './member.aggregate';
 
 export interface MemberProps extends AggregateRootProps {
   accountId: string;

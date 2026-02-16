@@ -1,5 +1,5 @@
-import { KnownEventFromType } from '@slack/bolt';
-import { GenericMessageEvent } from '@slack/types';
+import type { KnownEventFromType } from '@slack/bolt';
+import type { GenericMessageEvent } from '@slack/types';
 
 export const isGenericMessage = (
   event: KnownEventFromType<'message'>,

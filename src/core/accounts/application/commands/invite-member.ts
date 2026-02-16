@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 
-import { Member, MemberRepository } from '@/accounts/domain';
-import { User, UserRepository } from '@/users/domain';
+import { Member, type MemberRepository } from '@/accounts/domain';
+import { User, type UserRepository } from '@/users/domain';
 
 export class InviteMemberCommand {
   constructor(

@@ -1,5 +1,5 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ReactionAddedEvent } from '@slack/types';
+import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
+import type { ReactionAddedEvent } from '@slack/types';
 
 export class FilterIncomingReactionCommand {
   constructor(
@@ -10,7 +10,9 @@ export class FilterIncomingReactionCommand {
 }
 
 @CommandHandler(FilterIncomingReactionCommand)
-export class FilterIncomingReactionHandler implements ICommandHandler<FilterIncomingReactionCommand> {
+export class FilterIncomingReactionHandler
+  implements ICommandHandler<FilterIncomingReactionCommand>
+{
   async execute(command: FilterIncomingReactionCommand): Promise<void> {
     const { event } = command.props;
 

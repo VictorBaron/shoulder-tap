@@ -1,8 +1,8 @@
-import { IDomainEvent } from './domain-event';
+import type { IDomainEvent } from './domain-event';
 import {
   SoftDeletableEntity,
-  SoftDeletableEntityJSON,
-  SoftDeletableEntityProps,
+  type SoftDeletableEntityJSON,
+  type SoftDeletableEntityProps,
 } from './entity';
 
 type EventPublisher = { publish: (event: IDomainEvent) => void };
@@ -19,12 +19,13 @@ export abstract class AggregateRoot<
     this.domainEvents.push(...events);
   }
 
-  public findEvents<T extends IDomainEvent>(
-    eventType: new (...args: any[]) => T,
-  ): Array<T> {
+  public findEvents<EventType extends IDomainEvent>(
+    // biome-ignore lint/suspicious/noExplicitAny: Args could be anything
+    eventType: new (...args: any[]) => EventType,
+  ): Array<EventType> {
     return this.domainEvents
       .filter((e) => e.constructor.name === eventType.name)
-      .map((event) => event as T);
+      .map((event) => event as EventType);
   }
 
   public publishEvents(publisher: EventPublisher): void {

@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import {
+import type {
   Account,
   AccountRepository,
   MemberRepository,

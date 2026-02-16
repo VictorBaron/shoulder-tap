@@ -1,25 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import type { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
+import {
+  type Profile,
+  Strategy,
+  type VerifyCallback,
+} from 'passport-google-oauth20';
 
 import {
   CreateOAuthUserCommand,
-  CreateOAuthUserHandler,
+  type CreateOAuthUserHandler,
   LinkGoogleAccountCommand,
-  LinkGoogleAccountHandler,
+  type LinkGoogleAccountHandler,
 } from '@/users/application/commands';
 import {
-  GetUserByEmailHandler,
+  type GetUserByEmailHandler,
   GetUserByEmailQuery,
-  GetUserByGoogleIdHandler,
+  type GetUserByGoogleIdHandler,
   GetUserByGoogleIdQuery,
 } from '@/users/application/queries';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
-    private readonly config: ConfigService,
+    readonly config: ConfigService,
     private readonly getUserByGoogleIdHandler: GetUserByGoogleIdHandler,
     private readonly getUserByEmailHandler: GetUserByEmailHandler,
     private readonly createOAuthUserHandler: CreateOAuthUserHandler,

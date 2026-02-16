@@ -1,6 +1,9 @@
-import { AggregateRoot } from './aggregate-root';
+import type { AggregateRoot } from './aggregate-root';
+import type { SoftDeletableEntityProps } from './entity';
 
-export class RepositoryInMemory<Aggregate extends AggregateRoot<any>> {
+export class RepositoryInMemory<
+  Aggregate extends AggregateRoot<SoftDeletableEntityProps>,
+> {
   constructor(
     protected readonly aggregates: Map<string, Aggregate> = new Map(),
   ) {}

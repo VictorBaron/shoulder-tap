@@ -1,4 +1,4 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { type DynamicModule, Module } from '@nestjs/common';
 
 import { InMemoryUserPersistenceModule } from './inmemory/in-memory-user-persistence.module';
 import { MikroOrmUserPersistenceModule } from './mikro-orm/mikro-orm-user-persistence.module';

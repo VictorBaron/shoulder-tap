@@ -1,4 +1,4 @@
-import { AggregateRoot, AggregateRootProps } from 'common/domain';
+import { AggregateRoot, type AggregateRootProps } from 'common/domain';
 
 interface SlackInstallationProps extends AggregateRootProps {
   teamId: string | null;

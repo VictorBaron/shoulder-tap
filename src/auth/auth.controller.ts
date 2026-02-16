@@ -7,14 +7,14 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { type Request, type Response } from 'express';
+import type { ConfigService } from '@nestjs/config';
+import type { Request, Response } from 'express';
 
-import { UserJSON } from '@/users/domain';
+import type { UserJSON } from '@/users/domain';
 
-import { AuthService } from './auth.service';
+import type { AuthService } from './auth.service';
 import { CookieAuthGuard } from './cookie-auth.guard';
-import { LoginDto } from './dto';
+import type { LoginDto } from './dto';
 import { GoogleAuthGuard } from './google-auth.guard';
 
 @Controller('v1/auth')

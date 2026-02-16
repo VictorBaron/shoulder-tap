@@ -1,4 +1,4 @@
-import { Installation } from '@slack/bolt';
+import type { Installation } from '@slack/bolt';
 
 import { SlackInstallation } from '@/slack/domain/slack-installation.aggregate';
 

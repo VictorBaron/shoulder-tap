@@ -1,4 +1,4 @@
-import { DomainModel, DomainModelProps } from './domain-model';
+import { DomainModel, type DomainModelProps } from './domain-model';
 
 export interface EntityProps extends DomainModelProps {
   id: string;

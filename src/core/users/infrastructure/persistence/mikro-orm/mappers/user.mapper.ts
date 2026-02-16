@@ -1,4 +1,4 @@
-import { Email, User, UserJSON } from '@/users/domain';
+import { Email, User, type UserJSON } from '@/users/domain';
 import { UserMikroOrm } from '@/users/infrastructure/persistence/mikro-orm';
 
 export class UserMapper {

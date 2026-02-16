@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { WebClient } from '@slack/web-api';
 
-import {
+import type {
   SlackUserInfo,
   SlackUsersGateway,
 } from '@/accounts/domain/gateways/slack-users.gateway';
@@ -17,8 +17,9 @@ export class WebApiSlackUsersGateway implements SlackUsersGateway {
       const response = await client.users.list({ cursor, limit: 200 });
 
       for (const member of response.members ?? []) {
+        if (!member.id) continue;
         users.push({
-          slackId: member.id!,
+          slackId: member.id,
           email: member.profile?.email ?? null,
           name: member.real_name ?? member.name ?? 'Unknown',
           isBot: member.is_bot ?? false,

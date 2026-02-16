@@ -1,10 +1,10 @@
-import { EntityManager } from '@mikro-orm/postgresql';
+import type { EntityManager } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
-import { EventBus } from '@nestjs/cqrs';
+import type { EventBus } from '@nestjs/cqrs';
 import { RepositoryMikroORM } from 'common/domain';
 
-import { SlackInstallation } from '@/slack/domain/slack-installation.aggregate';
-import { SlackInstallationRepository } from '@/slack/domain/slack-installation.repository';
+import type { SlackInstallation } from '@/slack/domain/slack-installation.aggregate';
+import type { SlackInstallationRepository } from '@/slack/domain/slack-installation.repository';
 
 import { SlackInstallationMikroOrm } from './models/slack-installation.mikroORM';
 import { SlackInstallationMapper } from './slack-installation.mapper';

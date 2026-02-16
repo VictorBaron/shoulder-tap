@@ -3,9 +3,9 @@ import { Test } from '@nestjs/testing';
 import {
   Account,
   AccountCreatedEvent,
-  AccountJSON,
+  type AccountJSON,
   AccountRepository,
-  MemberJSON,
+  type MemberJSON,
   MemberRepository,
 } from '@/accounts/domain';
 import { MemberRoleLevel } from '@/accounts/domain/value-objects';

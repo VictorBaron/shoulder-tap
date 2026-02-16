@@ -5,7 +5,11 @@ import {
   AccountUpdatedEvent,
 } from '@/accounts/domain/events';
 
-import { AccountJSON, AccountProps, CreateAccountProps } from './account.types';
+import type {
+  AccountJSON,
+  AccountProps,
+  CreateAccountProps,
+} from './account.types';
 
 export class Account extends AggregateRoot {
   private name: string;

@@ -1,7 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
-import { SLACK_GATEWAY, SlackGateway } from './core/slack/domain/slack.gateway';
+import {
+  SLACK_GATEWAY,
+  type SlackGateway,
+} from './core/slack/domain/slack.gateway';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

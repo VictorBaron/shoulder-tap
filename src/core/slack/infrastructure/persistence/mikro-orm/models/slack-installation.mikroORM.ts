@@ -1,6 +1,6 @@
 import { Entity, Index, Property, Unique } from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
-import { OwnPersistenceEntityProperties } from 'common/types/misc';
+import type { OwnPersistenceEntityProperties } from 'common/types/misc';
 
 @Entity({ tableName: 'slack_installation' })
 @Unique({ properties: ['teamId', 'enterpriseId'] })

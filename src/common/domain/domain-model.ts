@@ -1,4 +1,4 @@
-import { Entity, EntityProps } from './entity';
+import type { Entity, EntityProps } from './entity';
 
 export type DomainModelProps = object;
 

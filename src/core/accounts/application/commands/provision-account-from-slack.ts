@@ -2,15 +2,15 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import {
   Account,
-  AccountRepository,
+  type AccountRepository,
   Member,
-  MemberRepository,
+  type MemberRepository,
 } from '@/accounts/domain';
 import {
   SLACK_USERS_GATEWAY,
   type SlackUsersGateway,
 } from '@/accounts/domain/gateways/slack-users.gateway';
-import { User, UserRepository } from '@/users/domain';
+import { User, type UserRepository } from '@/users/domain';
 
 export class ProvisionAccountFromSlackCommand {
   constructor(

@@ -1,8 +1,8 @@
 import { Entity, Index, Property, Unique } from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
-import { OwnPersistenceEntityProperties } from 'common/types/misc';
+import type { OwnPersistenceEntityProperties } from 'common/types/misc';
 
-import { MemberRoleLevel } from '@/accounts/domain';
+import type { MemberRoleLevel } from '@/accounts/domain';
 
 @Entity({ tableName: 'member' })
 @Unique({ properties: ['accountId', 'userId'] })

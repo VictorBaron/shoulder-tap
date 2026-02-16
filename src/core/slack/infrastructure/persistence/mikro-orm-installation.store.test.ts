@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { Installation } from '@slack/bolt';
+import type { Installation } from '@slack/bolt';
 
 import { ProvisionAccountFromSlackHandler } from '@/accounts/application/commands/provision-account-from-slack';
 import { SlackInstallationFactory } from '@/slack/__tests__/factories/slack-installation.factory';

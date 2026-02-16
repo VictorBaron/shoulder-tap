@@ -1,7 +1,7 @@
 import {
   Member,
   MemberPreferences,
-  MemberProps,
+  type MemberProps,
   MemberRole,
 } from '@/accounts/domain';
 

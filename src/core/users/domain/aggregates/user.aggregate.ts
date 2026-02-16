@@ -7,7 +7,7 @@ import {
   UserUpdatedEvent,
 } from '@/users/domain';
 
-import {
+import type {
   CreateOAuthUserProps,
   CreateSlackUserProps,
   CreateUserProps,

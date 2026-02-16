@@ -1,7 +1,7 @@
 import { RepositoryInMemory } from 'common/domain/repository.in-memory';
 
-import { SlackInstallation } from '@/slack/domain/slack-installation.aggregate';
-import {
+import type { SlackInstallation } from '@/slack/domain/slack-installation.aggregate';
+import type {
   SlackInstallationLookup,
   SlackInstallationRepository,
 } from '@/slack/domain/slack-installation.repository';

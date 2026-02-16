@@ -4,7 +4,7 @@ import { AccountFactory } from '@/accounts/__tests__/factories/account.factory';
 import { AccountRepository, MemberRepository } from '@/accounts/domain';
 import {
   SLACK_USERS_GATEWAY,
-  SlackUserInfo,
+  type SlackUserInfo,
 } from '@/accounts/domain/gateways/slack-users.gateway';
 import { MemberRoleLevel } from '@/accounts/domain/value-objects';
 import { FakeSlackUsersGateway } from '@/accounts/infrastructure/gateways/fake-slack-users.gateway';

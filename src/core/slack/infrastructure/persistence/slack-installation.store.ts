@@ -7,13 +7,13 @@ import type {
 
 import {
   ProvisionAccountFromSlackCommand,
-  ProvisionAccountFromSlackHandler,
+  type ProvisionAccountFromSlackHandler,
 } from '@/accounts/application/commands/provision-account-from-slack';
 import {
-  CreateSlackInstallationProps,
+  type CreateSlackInstallationProps,
   SlackInstallation,
 } from '@/slack/domain/slack-installation.aggregate';
-import { SlackInstallationRepository } from '@/slack/domain/slack-installation.repository';
+import type { SlackInstallationRepository } from '@/slack/domain/slack-installation.repository';
 
 import { SlackInstallationMapper } from './mikro-orm/slack-installation.mapper';
 

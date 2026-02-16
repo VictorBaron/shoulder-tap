@@ -1,6 +1,6 @@
 import { RepositoryPort } from 'common/domain/repository-port';
 
-import { Account } from '@/accounts/domain';
+import type { Account } from '@/accounts/domain';
 
 export abstract class AccountRepository extends RepositoryPort<Account> {
   abstract findById(id: string): Promise<Account | null>;

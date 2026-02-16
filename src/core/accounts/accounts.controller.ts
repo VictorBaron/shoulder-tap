@@ -10,22 +10,26 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CookieAuthGuard } from 'auth/cookie-auth.guard';
-import { Request } from 'express';
+import type { Request } from 'express';
 
 import {
   CreateAccountCommand,
-  CreateAccountHandler,
+  type CreateAccountHandler,
   UpdateAccountCommand,
-  UpdateAccountHandler,
+  type UpdateAccountHandler,
 } from './application/commands';
 import {
-  GetAccountByIdHandler,
+  type GetAccountByIdHandler,
   GetAccountByIdQuery,
-  GetUserAccountsHandler,
+  type GetUserAccountsHandler,
   GetUserAccountsQuery,
 } from './application/queries';
-import { Account, Member, MemberRepository } from './domain';
-import { AccountResponseDTO, CreateAccountDto, UpdateAccountDto } from './dto';
+import type { Account, Member, MemberRepository } from './domain';
+import type {
+  AccountResponseDTO,
+  CreateAccountDto,
+  UpdateAccountDto,
+} from './dto';
 
 interface AuthRequest extends Request {
   user: { sub: string; email: string; name?: string };

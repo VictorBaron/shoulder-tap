@@ -1,6 +1,6 @@
 import {
   SlackInstallation,
-  SlackInstallationJSON,
+  type SlackInstallationJSON,
 } from '@/slack/domain/slack-installation.aggregate';
 
 export class SlackInstallationFactory {

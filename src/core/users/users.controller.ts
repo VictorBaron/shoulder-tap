@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { CookieAuthGuard } from 'auth/cookie-auth.guard';
 
-import { GetAllUsersHandler } from './application/queries';
+import type { GetAllUsersHandler } from './application/queries';
 
 @Controller('v1/users')
 @UseGuards(CookieAuthGuard)

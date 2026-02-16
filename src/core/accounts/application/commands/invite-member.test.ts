@@ -3,15 +3,15 @@ import { Test } from '@nestjs/testing';
 
 import { MemberFactory } from '@/accounts/__tests__/factories/member.factory';
 import {
-  Member,
+  type Member,
   MemberInvitedEvent,
-  MemberJSON,
+  type MemberJSON,
   MemberRepository,
 } from '@/accounts/domain';
 import { MemberRole, MemberRoleLevel } from '@/accounts/domain/value-objects';
 import { InMemoryMemberRepository } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
 import { UserFactory } from '@/users/__tests__/factories/user.factory';
-import { Email, User, UserRepository } from '@/users/domain';
+import { Email, type User, UserRepository } from '@/users/domain';
 import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
 
 import { InviteMemberCommand, InviteMemberHandler } from './invite-member';

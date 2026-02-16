@@ -1,11 +1,11 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { CommandBus } from '@nestjs/cqrs';
+import { Inject, Injectable, type OnModuleInit } from '@nestjs/common';
+import type { ConfigService } from '@nestjs/config';
+import type { CommandBus } from '@nestjs/cqrs';
 import { App, ExpressReceiver, type InstallationStore } from '@slack/bolt';
 import type { Application } from 'express';
 
 import { FilterIncomingMessageCommand } from '@/filtering/application/commands/filter-incoming-message.command';
-import { SlackGateway } from '@/slack/domain/slack.gateway';
+import type { SlackGateway } from '@/slack/domain/slack.gateway';
 import { INSTALLATION_STORE } from '@/slack/infrastructure/persistence/installation-store.token';
 import { isGenericMessage } from '@/slack/types';
 

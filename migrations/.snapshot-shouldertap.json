@@ -1,7 +1,5 @@
 {
-  "namespaces": [
-    "public"
-  ],
+  "namespaces": ["public"],
   "name": "public",
   "tables": [
     {
@@ -70,9 +68,7 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "slack_team_id"
-          ],
+          "columnNames": ["slack_team_id"],
           "composite": false,
           "keyName": "account_slack_team_id_unique",
           "constraint": true,
@@ -81,9 +77,7 @@
         },
         {
           "keyName": "account_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -227,9 +221,7 @@
       "indexes": [
         {
           "keyName": "idx_member_userId",
-          "columnNames": [
-            "user_id"
-          ],
+          "columnNames": ["user_id"],
           "composite": false,
           "constraint": false,
           "primary": false,
@@ -237,9 +229,7 @@
         },
         {
           "keyName": "idx_member_accountId",
-          "columnNames": [
-            "account_id"
-          ],
+          "columnNames": ["account_id"],
           "composite": false,
           "constraint": false,
           "primary": false,
@@ -247,10 +237,7 @@
         },
         {
           "keyName": "member_account_id_user_id_unique",
-          "columnNames": [
-            "account_id",
-            "user_id"
-          ],
+          "columnNames": ["account_id", "user_id"],
           "composite": true,
           "constraint": true,
           "primary": false,
@@ -258,9 +245,7 @@
         },
         {
           "keyName": "member_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -444,9 +429,7 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "team_id"
-          ],
+          "columnNames": ["team_id"],
           "composite": false,
           "keyName": "slack_installation_team_id_index",
           "constraint": false,
@@ -454,9 +437,7 @@
           "unique": false
         },
         {
-          "columnNames": [
-            "enterprise_id"
-          ],
+          "columnNames": ["enterprise_id"],
           "composite": false,
           "keyName": "slack_installation_enterprise_id_index",
           "constraint": false,
@@ -464,9 +445,7 @@
           "unique": false
         },
         {
-          "columnNames": [
-            "user_id"
-          ],
+          "columnNames": ["user_id"],
           "composite": false,
           "keyName": "slack_installation_user_id_index",
           "constraint": false,
@@ -475,10 +454,7 @@
         },
         {
           "keyName": "slack_installation_team_id_enterprise_id_unique",
-          "columnNames": [
-            "team_id",
-            "enterprise_id"
-          ],
+          "columnNames": ["team_id", "enterprise_id"],
           "composite": true,
           "constraint": true,
           "primary": false,
@@ -486,9 +462,7 @@
         },
         {
           "keyName": "slack_installation_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -585,9 +559,7 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "email"
-          ],
+          "columnNames": ["email"],
           "composite": false,
           "keyName": "user_email_unique",
           "constraint": true,
@@ -595,9 +567,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "google_id"
-          ],
+          "columnNames": ["google_id"],
           "composite": false,
           "keyName": "user_google_id_index",
           "constraint": false,
@@ -605,9 +575,7 @@
           "unique": false
         },
         {
-          "columnNames": [
-            "google_id"
-          ],
+          "columnNames": ["google_id"],
           "composite": false,
           "keyName": "user_google_id_unique",
           "constraint": true,
@@ -616,9 +584,7 @@
         },
         {
           "keyName": "user_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,

@@ -1,4 +1,4 @@
-import { AggregateRootJSON, AggregateRootProps } from 'common/domain';
+import type { AggregateRootJSON, AggregateRootProps } from 'common/domain';
 
 export interface AccountProps extends AggregateRootProps {
   name: string;

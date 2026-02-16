@@ -1,12 +1,12 @@
 import {
-  CanActivate,
-  ExecutionContext,
+  type CanActivate,
+  type ExecutionContext,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Request } from 'express';
+import type { Request } from 'express';
 
-import { AuthService } from './auth.service';
+import type { AuthService } from './auth.service';
 
 @Injectable()
 export class CookieAuthGuard implements CanActivate {

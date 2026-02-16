@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { Account, AccountRepository, Member } from '@/accounts/domain';
+import type { Account, AccountRepository, Member } from '@/accounts/domain';
 
 export class UpdateAccountCommand {
   constructor(

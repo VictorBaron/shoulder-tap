@@ -1,16 +1,16 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import type { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 
 import {
   CreateUserCommand,
-  CreateUserHandler,
+  type CreateUserHandler,
 } from '@/users/application/commands';
 import {
-  GetUserByEmailHandler,
+  type GetUserByEmailHandler,
   GetUserByEmailQuery,
 } from '@/users/application/queries';
-import { User, UserJSON } from '@/users/domain';
+import type { User, UserJSON } from '@/users/domain';
 
 @Injectable()
 export class AuthService {

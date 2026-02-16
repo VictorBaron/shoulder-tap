@@ -1,7 +1,3 @@
-interface ValueObjectProps {
-  [index: string]: any;
-}
-
 /**
  * @desc ValueObjects are objects that we determine their
  * equality through their structural property.
@@ -9,7 +5,7 @@ interface ValueObjectProps {
  * you should create a new instance of the value object.
  */
 
-export abstract class ValueObject<T extends ValueObjectProps> {
+export abstract class ValueObject<T extends object> {
   constructor(protected readonly props: T) {}
 
   public equals(valueObject?: ValueObject<T>): boolean {

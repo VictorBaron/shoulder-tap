@@ -1,4 +1,4 @@
-import { Email, User, UserProps } from '@/users/domain';
+import { Email, User, type UserProps } from '@/users/domain';
 
 export class UserFactory {
   static create(overrides?: Partial<UserProps>): User {

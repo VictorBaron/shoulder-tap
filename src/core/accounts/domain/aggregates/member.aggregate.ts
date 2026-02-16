@@ -10,7 +10,7 @@ import {
 } from '@/accounts/domain/events';
 import { MemberPreferences, MemberRole } from '@/accounts/domain/value-objects';
 
-import {
+import type {
   CreateFounderMemberProps,
   CreateMemberProps,
   MemberJSON,

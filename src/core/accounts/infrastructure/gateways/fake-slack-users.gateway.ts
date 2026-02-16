@@ -1,4 +1,4 @@
-import {
+import type {
   SlackUserInfo,
   SlackUsersGateway,
 } from '@/accounts/domain/gateways/slack-users.gateway';
