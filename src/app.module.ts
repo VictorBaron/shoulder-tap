@@ -4,7 +4,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 
+import { AccountsModule } from '@/accounts/accounts.module';
 import { FilteringModule } from '@/filtering/filtering.module';
+import { UsersModule } from '@/users/users.module';
 
 import { AccountMikroOrm } from './core/accounts/infrastructure/persistence/mikro-orm/models/account.mikroORM';
 import { MemberMikroOrm } from './core/accounts/infrastructure/persistence/mikro-orm/models/member.mikroORM';
@@ -30,6 +32,8 @@ import { UserMikroOrm } from './core/users/infrastructure/persistence/mikro-orm/
       }),
       inject: [ConfigService],
     }),
+    AccountsModule,
+    UsersModule,
     SlackModule,
     FilteringModule,
   ],

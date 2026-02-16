@@ -6,6 +6,10 @@ export class CreateAccountDto {
   @IsString()
   @IsNotEmpty()
   name!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  slackTeamId!: string;
 }
 
 export class UpdateAccountDto {

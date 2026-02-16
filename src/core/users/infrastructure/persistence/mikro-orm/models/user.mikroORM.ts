@@ -1,5 +1,6 @@
 import { Entity, Index, Property, Unique } from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
+import { OwnPersistenceEntityProperties } from 'common/types/misc';
 
 @Entity({ tableName: 'user' })
 export class UserMikroOrm extends PersistenceEntity {
@@ -17,4 +18,15 @@ export class UserMikroOrm extends PersistenceEntity {
   @Unique()
   @Index()
   googleId: string | null;
+
+  @Property({ type: 'varchar', length: 255, nullable: true })
+  @Unique()
+  @Index()
+  slackId: string | null;
+
+  static build(
+    props: OwnPersistenceEntityProperties<UserMikroOrm>,
+  ): UserMikroOrm {
+    return Object.assign(new UserMikroOrm(), props);
+  }
 }

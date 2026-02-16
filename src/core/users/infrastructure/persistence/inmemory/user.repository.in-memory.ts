@@ -19,4 +19,10 @@ export class UserRepositoryInMemory
       this.toArray().find((user) => user.getGoogleId() === googleId) ?? null,
     );
   }
+
+  async findBySlackId(slackId: string): Promise<User | null> {
+    return Promise.resolve(
+      this.toArray().find((user) => user.getSlackId() === slackId) ?? null,
+    );
+  }
 }

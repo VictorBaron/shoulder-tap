@@ -9,6 +9,7 @@ import {
 
 import {
   CreateOAuthUserProps,
+  CreateSlackUserProps,
   CreateUserProps,
   UserJSON,
   UserProps,
@@ -19,6 +20,7 @@ export class User extends AggregateRoot {
   private name: string | null;
   private password: string | null;
   private googleId: string | null;
+  private slackId: string | null;
 
   private constructor(props: UserProps) {
     super({
@@ -31,6 +33,7 @@ export class User extends AggregateRoot {
     this.name = props.name;
     this.password = props.password;
     this.googleId = props.googleId;
+    this.slackId = props.slackId;
   }
 
   static create(props: CreateUserProps): User {
@@ -43,6 +46,7 @@ export class User extends AggregateRoot {
       name: props.name ?? null,
       password: props.password ?? null,
       googleId: props.googleId ?? null,
+      slackId: null,
       createdAt: now,
       updatedAt: now,
       deletedAt: null,
@@ -68,6 +72,33 @@ export class User extends AggregateRoot {
       name: props.name ?? null,
       password: null,
       googleId: props.googleId,
+      slackId: null,
+      createdAt: now,
+      updatedAt: now,
+      deletedAt: null,
+    });
+
+    user.addDomainEvent(
+      new UserCreatedEvent({
+        userId: user.id,
+        email: email.getValue(),
+      }),
+    );
+
+    return user;
+  }
+
+  static createFromSlack(props: CreateSlackUserProps): User {
+    const email = Email.create(props.email);
+    const now = new Date();
+
+    const user = new User({
+      id: crypto.randomUUID(),
+      email,
+      name: props.name,
+      password: null,
+      googleId: null,
+      slackId: props.slackId,
       createdAt: now,
       updatedAt: now,
       deletedAt: null,
@@ -134,6 +165,10 @@ export class User extends AggregateRoot {
     return this.googleId;
   }
 
+  getSlackId(): string | null {
+    return this.slackId;
+  }
+
   toJSON(): UserJSON {
     return {
       id: this.id,
@@ -141,6 +176,7 @@ export class User extends AggregateRoot {
       name: this.name,
       password: this.password,
       googleId: this.googleId,
+      slackId: this.slackId,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       deletedAt: this.deletedAt,

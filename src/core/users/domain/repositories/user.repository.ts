@@ -7,6 +7,7 @@ export abstract class UserRepository extends RepositoryPort<User> {
   abstract findByIds(ids: string[]): Promise<User[]>;
   abstract findByEmail(email: string): Promise<User | null>;
   abstract findByGoogleId(googleId: string): Promise<User | null>;
+  abstract findBySlackId(slackId: string): Promise<User | null>;
   abstract findAll(): Promise<User[]>;
   abstract save(user: User): Promise<void>;
 }

@@ -76,6 +76,7 @@ export class AccountsController {
   async create(@Req() req: AuthRequest, @Body() dto: CreateAccountDto) {
     const command = new CreateAccountCommand({
       name: dto.name,
+      slackTeamId: dto.slackTeamId,
       creatorUserId: req.user.sub,
     });
 

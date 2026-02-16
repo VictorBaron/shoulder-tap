@@ -12,6 +12,7 @@ export class CreateAccountCommand {
     readonly props: {
       name: string;
       creatorUserId: string;
+      slackTeamId: string;
     },
   ) {}
 }
@@ -24,10 +25,11 @@ export class CreateAccountHandler {
   ) {}
 
   async execute(command: CreateAccountCommand): Promise<Account> {
-    const { name, creatorUserId } = command.props;
+    const { name, creatorUserId, slackTeamId } = command.props;
 
     const account = Account.create({
       name,
+      slackTeamId,
     });
 
     const founder = Member.createFounder({

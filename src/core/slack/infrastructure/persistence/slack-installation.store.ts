@@ -6,6 +6,10 @@ import type {
 } from '@slack/bolt';
 
 import {
+  ProvisionAccountFromSlackCommand,
+  ProvisionAccountFromSlackHandler,
+} from '@/accounts/application/commands/provision-account-from-slack';
+import {
   CreateSlackInstallationProps,
   SlackInstallation,
 } from '@/slack/domain/slack-installation.aggregate';
@@ -15,7 +19,10 @@ import { SlackInstallationMapper } from './mikro-orm/slack-installation.mapper';
 
 @Injectable()
 export class SlackInstallationStore implements InstallationStore {
-  constructor(private readonly repository: SlackInstallationRepository) {}
+  constructor(
+    private readonly repository: SlackInstallationRepository,
+    private readonly provisionHandler: ProvisionAccountFromSlackHandler,
+  ) {}
 
   async storeInstallation<AuthVersion extends 'v1' | 'v2'>(
     installation: Installation<AuthVersion, boolean>,
@@ -52,6 +59,17 @@ export class SlackInstallationStore implements InstallationStore {
     const slackInstallation = SlackInstallation.create(fields);
 
     await this.repository.save(slackInstallation);
+
+    if (teamId && fields.botToken) {
+      await this.provisionHandler.execute(
+        new ProvisionAccountFromSlackCommand({
+          teamId,
+          teamName: fields.teamName ?? teamId,
+          botToken: fields.botToken,
+          installerSlackUserId: fields.userId,
+        }),
+      );
+    }
   }
 
   async fetchInstallation(

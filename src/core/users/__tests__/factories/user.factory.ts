@@ -7,6 +7,7 @@ export class UserFactory {
       name: 'John Doe',
       password: 'pwd',
       googleId: 'googleId',
+      slackId: 'slackId',
       email: Email.create('user@email.com'),
       createdAt: new Date('2025-01-01'),
       updatedAt: new Date('2025-01-01'),

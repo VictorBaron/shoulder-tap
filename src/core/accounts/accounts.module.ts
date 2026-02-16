@@ -14,12 +14,15 @@ import {
   InviteMemberHandler,
   UpdateAccountHandler,
 } from './application/commands';
+import { ProvisionAccountFromSlackHandler } from './application/commands/provision-account-from-slack';
 import {
   GetAccountByIdHandler,
   GetAccountMembersHandler,
   GetPendingInvitationsHandler,
   GetUserAccountsHandler,
 } from './application/queries';
+import { SLACK_USERS_GATEWAY } from './domain/gateways/slack-users.gateway';
+import { WebApiSlackUsersGateway } from './infrastructure/gateways/web-api-slack-users.gateway';
 import { AccountPersistenceModule } from './infrastructure/persistence/account-persistence.module';
 import { InvitationsController, MembersController } from './members.controller';
 
@@ -39,6 +42,8 @@ import { InvitationsController, MembersController } from './members.controller';
     DisableMemberHandler,
     EnableMemberHandler,
     ChangeMemberRoleHandler,
+    ProvisionAccountFromSlackHandler,
+    { provide: SLACK_USERS_GATEWAY, useClass: WebApiSlackUsersGateway },
     GetAccountByIdHandler,
     GetUserAccountsHandler,
     GetAccountMembersHandler,
@@ -49,6 +54,7 @@ import { InvitationsController, MembersController } from './members.controller';
     GetUserAccountsHandler,
     GetAccountMembersHandler,
     GetPendingInvitationsHandler,
+    ProvisionAccountFromSlackHandler,
   ],
 })
 export class AccountsModule {}

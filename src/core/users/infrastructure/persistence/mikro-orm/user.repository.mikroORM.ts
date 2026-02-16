@@ -40,6 +40,11 @@ export class UserRepositoryMikroOrm
     return entity ? UserMapper.toDomain(entity) : null;
   }
 
+  async findBySlackId(slackId: string): Promise<User | null> {
+    const entity = await this.em.findOne(UserMikroOrm, { slackId });
+    return entity ? UserMapper.toDomain(entity) : null;
+  }
+
   async findAll(): Promise<User[]> {
     const entities = await this.em.find(
       UserMikroOrm,

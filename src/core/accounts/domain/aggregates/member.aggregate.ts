@@ -102,6 +102,26 @@ export class Member extends AggregateRoot {
     return member;
   }
 
+  static createActive(props: CreateFounderMemberProps): Member {
+    const now = new Date();
+
+    return new Member({
+      id: crypto.randomUUID(),
+      accountId: props.accountId,
+      userId: props.userId,
+      role: MemberRole.user,
+      invitedAt: null,
+      activatedAt: now,
+      disabledAt: null,
+      invitedById: null,
+      lastActiveAt: now,
+      preferences: MemberPreferences.empty(),
+      createdAt: now,
+      updatedAt: now,
+      deletedAt: null,
+    });
+  }
+
   static reconstitute(props: MemberProps): Member {
     return new Member(props);
   }

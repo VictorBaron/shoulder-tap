@@ -1,0 +1,319 @@
+import { Test } from '@nestjs/testing';
+
+import { AccountFactory } from '@/accounts/__tests__/factories/account.factory';
+import { AccountRepository, MemberRepository } from '@/accounts/domain';
+import {
+  SLACK_USERS_GATEWAY,
+  SlackUserInfo,
+} from '@/accounts/domain/gateways/slack-users.gateway';
+import { MemberRoleLevel } from '@/accounts/domain/value-objects';
+import { FakeSlackUsersGateway } from '@/accounts/infrastructure/gateways/fake-slack-users.gateway';
+import { AccountRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/account.repository.in-memory';
+import { InMemoryMemberRepository } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
+import { UserRepository } from '@/users/domain';
+import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
+
+import {
+  ProvisionAccountFromSlackCommand,
+  ProvisionAccountFromSlackHandler,
+} from './provision-account-from-slack';
+
+const makeSlackUser = (overrides?: Partial<SlackUserInfo>): SlackUserInfo => ({
+  slackId: 'U001',
+  email: 'user@example.com',
+  name: 'John Doe',
+  isBot: false,
+  deleted: false,
+  ...overrides,
+});
+
+describe('Provision Account From Slack', () => {
+  let handler: ProvisionAccountFromSlackHandler;
+  let accountRepository: AccountRepositoryInMemory;
+  let memberRepository: InMemoryMemberRepository;
+  let userRepository: UserRepositoryInMemory;
+  let slackUsersGateway: FakeSlackUsersGateway;
+
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+      providers: [
+        ProvisionAccountFromSlackHandler,
+        { provide: AccountRepository, useClass: AccountRepositoryInMemory },
+        { provide: MemberRepository, useClass: InMemoryMemberRepository },
+        { provide: UserRepository, useClass: UserRepositoryInMemory },
+        { provide: SLACK_USERS_GATEWAY, useClass: FakeSlackUsersGateway },
+      ],
+    }).compile();
+
+    handler = module.get(ProvisionAccountFromSlackHandler);
+    accountRepository =
+      module.get<AccountRepositoryInMemory>(AccountRepository);
+    memberRepository = module.get<InMemoryMemberRepository>(MemberRepository);
+    userRepository = module.get<UserRepositoryInMemory>(UserRepository);
+    slackUsersGateway = module.get<FakeSlackUsersGateway>(SLACK_USERS_GATEWAY);
+
+    slackUsersGateway.setUsers([
+      makeSlackUser({
+        slackId: 'U_INSTALLER',
+        email: 'installer@example.com',
+        name: 'Installer',
+      }),
+    ]);
+
+    accountRepository.clear();
+    memberRepository.clear();
+    userRepository.clear();
+  });
+
+  describe('when the Slack team has not been provisioned yet', () => {
+    it('should create an account with the team name and teamId', async () => {
+      const command = new ProvisionAccountFromSlackCommand({
+        teamId: 'T_ACME',
+        teamName: 'Acme Corp',
+        botToken: 'xoxb-token',
+        installerSlackUserId: 'U_INSTALLER',
+      });
+
+      await handler.execute(command);
+
+      const account = await accountRepository.findBySlackTeamId('T_ACME');
+      expect(account).not.toBeNull();
+      expect(account?.toJSON()).toMatchObject({
+        name: 'Acme Corp',
+        slackTeamId: 'T_ACME',
+      });
+    });
+
+    it('should create a User and a founder Member for the installing Slack user', async () => {
+      const command = new ProvisionAccountFromSlackCommand({
+        teamId: 'T_ACME',
+        teamName: 'Acme Corp',
+        botToken: 'xoxb-token',
+        installerSlackUserId: 'U_INSTALLER',
+      });
+
+      await handler.execute(command);
+
+      const account = await accountRepository.findBySlackTeamId('T_ACME');
+      const installerUser = await userRepository.findBySlackId('U_INSTALLER');
+
+      expect(installerUser).not.toBeNull();
+      expect(installerUser?.getSlackId()).toBe('U_INSTALLER');
+
+      const members = await memberRepository.findByAccountId(account!.getId());
+      expect(members).toHaveLength(1);
+
+      const founderMember = members[0];
+      expect(founderMember.toJSON()).toMatchObject({
+        accountId: account!.getId(),
+        userId: installerUser!.getId(),
+        role: MemberRoleLevel.ADMIN,
+      });
+      expect(founderMember.isActive()).toBe(true);
+    });
+
+    it('should create a User and an active Member for each non-bot, non-deleted team member', async () => {
+      slackUsersGateway.setUsers([
+        makeSlackUser({
+          slackId: 'U_INSTALLER',
+          email: 'installer@example.com',
+          name: 'Installer',
+        }),
+        makeSlackUser({
+          slackId: 'U002',
+          email: 'alice@example.com',
+          name: 'Alice',
+        }),
+        makeSlackUser({
+          slackId: 'U003',
+          email: 'bob@example.com',
+          name: 'Bob',
+        }),
+      ]);
+
+      const command = new ProvisionAccountFromSlackCommand({
+        teamId: 'T_ACME',
+        teamName: 'Acme Corp',
+        botToken: 'xoxb-token',
+        installerSlackUserId: 'U_INSTALLER',
+      });
+
+      await handler.execute(command);
+
+      const account = await accountRepository.findBySlackTeamId('T_ACME');
+      const members = await memberRepository.findByAccountId(account!.getId());
+
+      expect(members).toHaveLength(3);
+
+      const alice = await userRepository.findBySlackId('U002');
+      const aliceMember = members.find(
+        (m) => m.toJSON().userId === alice!.getId(),
+      );
+      expect(aliceMember?.toJSON()).toMatchObject({
+        role: MemberRoleLevel.USER,
+      });
+      expect(aliceMember?.isActive()).toBe(true);
+
+      const bob = await userRepository.findBySlackId('U003');
+      const bobMember = members.find((m) => m.toJSON().userId === bob!.getId());
+      expect(bobMember?.toJSON()).toMatchObject({
+        role: MemberRoleLevel.USER,
+      });
+      expect(bobMember?.isActive()).toBe(true);
+    });
+
+    it('should skip bot users', async () => {
+      slackUsersGateway.setUsers([
+        makeSlackUser({
+          slackId: 'U_INSTALLER',
+          email: 'installer@example.com',
+          name: 'Installer',
+        }),
+        makeSlackUser({
+          slackId: 'U_BOT',
+          email: null,
+          name: 'My Bot',
+          isBot: true,
+        }),
+      ]);
+
+      const command = new ProvisionAccountFromSlackCommand({
+        teamId: 'T_ACME',
+        teamName: 'Acme Corp',
+        botToken: 'xoxb-token',
+        installerSlackUserId: 'U_INSTALLER',
+      });
+
+      await handler.execute(command);
+
+      const account = await accountRepository.findBySlackTeamId('T_ACME');
+      const members = await memberRepository.findByAccountId(account!.getId());
+      expect(members).toHaveLength(1);
+
+      const botUser = await userRepository.findBySlackId('U_BOT');
+      expect(botUser).toBeNull();
+    });
+
+    it('should skip deleted users', async () => {
+      slackUsersGateway.setUsers([
+        makeSlackUser({
+          slackId: 'U_INSTALLER',
+          email: 'installer@example.com',
+          name: 'Installer',
+        }),
+        makeSlackUser({
+          slackId: 'U_DELETED',
+          email: 'gone@example.com',
+          name: 'Deleted User',
+          deleted: true,
+        }),
+      ]);
+
+      const command = new ProvisionAccountFromSlackCommand({
+        teamId: 'T_ACME',
+        teamName: 'Acme Corp',
+        botToken: 'xoxb-token',
+        installerSlackUserId: 'U_INSTALLER',
+      });
+
+      await handler.execute(command);
+
+      const account = await accountRepository.findBySlackTeamId('T_ACME');
+      const members = await memberRepository.findByAccountId(account!.getId());
+      expect(members).toHaveLength(1);
+
+      const deletedUser = await userRepository.findBySlackId('U_DELETED');
+      expect(deletedUser).toBeNull();
+    });
+
+    it('should use an existing User when one already exists with the same slackId', async () => {
+      slackUsersGateway.setUsers([
+        makeSlackUser({
+          slackId: 'U_INSTALLER',
+          email: 'installer@example.com',
+          name: 'Installer',
+        }),
+        makeSlackUser({
+          slackId: 'U002',
+          email: 'alice@example.com',
+          name: 'Alice',
+        }),
+      ]);
+
+      const existingUser = await userRepository.findBySlackId('U002');
+      expect(existingUser).toBeNull();
+
+      const command = new ProvisionAccountFromSlackCommand({
+        teamId: 'T_ACME',
+        teamName: 'Acme Corp',
+        botToken: 'xoxb-token',
+        installerSlackUserId: 'U_INSTALLER',
+      });
+
+      await handler.execute(command);
+
+      const aliceAfterFirstRun = await userRepository.findBySlackId('U002');
+      expect(aliceAfterFirstRun).not.toBeNull();
+
+      accountRepository.clear();
+      memberRepository.clear();
+
+      slackUsersGateway.setUsers([
+        makeSlackUser({
+          slackId: 'U_INSTALLER2',
+          email: 'installer2@example.com',
+          name: 'Installer2',
+        }),
+        makeSlackUser({
+          slackId: 'U002',
+          email: 'alice@example.com',
+          name: 'Alice',
+        }),
+      ]);
+
+      const command2 = new ProvisionAccountFromSlackCommand({
+        teamId: 'T_OTHER',
+        teamName: 'Other Corp',
+        botToken: 'xoxb-token-2',
+        installerSlackUserId: 'U_INSTALLER2',
+      });
+
+      await handler.execute(command2);
+
+      const aliceUsers = (await userRepository.findAll()).filter(
+        (u) => u.getSlackId() === 'U002',
+      );
+      expect(aliceUsers).toHaveLength(1);
+
+      const account2 = await accountRepository.findBySlackTeamId('T_OTHER');
+      const members2 = await memberRepository.findByAccountId(
+        account2!.getId(),
+      );
+      const aliceMember = members2.find(
+        (m) => m.toJSON().userId === aliceAfterFirstRun!.getId(),
+      );
+      expect(aliceMember).toBeDefined();
+    });
+  });
+
+  describe('when the account already exists for this teamId', () => {
+    it('should skip provisioning entirely', async () => {
+      const existingAccount = AccountFactory.create({
+        slackTeamId: 'T_ACME',
+      });
+      await accountRepository.save(existingAccount);
+
+      const command = new ProvisionAccountFromSlackCommand({
+        teamId: 'T_ACME',
+        teamName: 'Acme Corp',
+        botToken: 'xoxb-token',
+        installerSlackUserId: 'U_INSTALLER',
+      });
+
+      await handler.execute(command);
+
+      const accounts = await accountRepository.findAll();
+      expect(accounts).toHaveLength(1);
+    });
+  });
+});

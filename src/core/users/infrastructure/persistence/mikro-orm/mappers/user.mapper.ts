@@ -9,6 +9,7 @@ export class UserMapper {
       name: raw.name,
       password: raw.password,
       googleId: raw.googleId,
+      slackId: raw.slackId,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
       deletedAt: raw.deletedAt,
@@ -17,15 +18,10 @@ export class UserMapper {
 
   static toPersistence(user: User): UserMikroOrm {
     const json = user.toJSON();
-    const entity = new UserMikroOrm();
-    entity.id = json.id;
-    entity.email = json.email;
-    entity.name = json.name;
-    entity.password = json.password;
-    entity.googleId = json.googleId;
-    entity.createdAt = json.createdAt;
-    entity.updatedAt = json.updatedAt;
-    entity.deletedAt = json.deletedAt;
+    const entity = UserMikroOrm.build({
+      ...json,
+    });
+
     return entity;
   }
 

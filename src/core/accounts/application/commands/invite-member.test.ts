@@ -14,10 +14,7 @@ import { UserFactory } from '@/users/__tests__/factories/user.factory';
 import { Email, User, UserRepository } from '@/users/domain';
 import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
 
-import {
-  InviteMemberCommand,
-  InviteMemberHandler,
-} from './invite-member.command';
+import { InviteMemberCommand, InviteMemberHandler } from './invite-member';
 
 describe('Invite member', () => {
   let handler: InviteMemberHandler;

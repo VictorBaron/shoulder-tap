@@ -13,6 +13,7 @@ const SLACK_SCOPES = [
   'chat:write',
   'im:write',
   'users:read',
+  'users:read.email',
   'reactions:read',
 ] as const;
 
