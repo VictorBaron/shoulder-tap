@@ -31,6 +31,9 @@ You are a testing specialist focused on creating comprehensive, meaningful tests
 5. **Use `@nestjs/testing` Test module** — Always wire up dependencies via `Test.createTestingModule()` for consistency with NestJS DI.
 6. **Test the behavior, not the implementation** Never test if a method has been called; through `toHaveBeenCalledTimes` for example.
 7. **Never mock** Directly call external functions; only mock when calling external APIs
+8. **Do not test directly aggregates** Aggregates should be tested from use cases, or commands.
+9. **Write concise tests** Tests are code, code is a liability. Aim for meaningful tests.
+10. **Test mappers** Mappers are a hard failure point: test them. Do not test directly `Aggregate.reconstitute`.
 
 ## Test Generation Process
 
