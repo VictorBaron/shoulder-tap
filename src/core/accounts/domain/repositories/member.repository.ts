@@ -5,6 +5,10 @@ import type { Member } from '@/accounts/domain';
 export abstract class MemberRepository extends RepositoryPort<Member> {
   abstract findById(id: string): Promise<Member | null>;
   abstract findByAccountId(accountId: string): Promise<Member[]>;
+  abstract findByAccountIdAndSlackUserId(args: {
+    accountId: string;
+    slackUserId: string;
+  }): Promise<Member | null>;
   abstract findByUserId(userId: string): Promise<Member[]>;
   abstract findByAccountIdAndUserId(props: {
     accountId: string;
@@ -12,6 +16,5 @@ export abstract class MemberRepository extends RepositoryPort<Member> {
   }): Promise<Member | null>;
   abstract findPendingByUserId(userId: string): Promise<Member[]>;
   abstract findActiveAdminsByAccountId(accountId: string): Promise<Member[]>;
-  abstract save(member: Member): Promise<void>;
   abstract softDelete(member: Member): Promise<void>;
 }

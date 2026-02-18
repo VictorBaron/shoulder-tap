@@ -16,6 +16,17 @@ export class RepositoryInMemory<
     return Array.from(this.aggregates.values());
   }
 
+  find(
+    predicate: (v: Aggregate, i: number, obj: Aggregate[]) => boolean,
+  ): Promise<Aggregate | null> {
+    return Promise.resolve(this.toArray().find(predicate) ?? null);
+  }
+  filter(
+    predicate: (v: Aggregate, i: number, obj: Aggregate[]) => boolean,
+  ): Promise<Aggregate[]> {
+    return Promise.resolve(this.toArray().filter(predicate));
+  }
+
   async findById(id: string): Promise<Aggregate | null> {
     return Promise.resolve(this.get(id) ?? null);
   }

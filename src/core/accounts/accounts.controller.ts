@@ -9,14 +9,13 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
 import { CookieAuthGuard } from 'auth/cookie-auth.guard';
 import type { Request } from 'express';
 
 import {
   CreateAccountCommand,
-  CreateAccountHandler,
   UpdateAccountCommand,
-  UpdateAccountHandler,
 } from './application/commands';
 import {
   GetAccountByIdHandler,
@@ -39,8 +38,7 @@ interface AuthRequest extends Request {
 @UseGuards(CookieAuthGuard)
 export class AccountsController {
   constructor(
-    private readonly createAccountHandler: CreateAccountHandler,
-    private readonly updateAccountHandler: UpdateAccountHandler,
+    private readonly commandBus: CommandBus,
     private readonly getAccountByIdHandler: GetAccountByIdHandler,
     private readonly getUserAccountsHandler: GetUserAccountsHandler,
     private readonly memberRepository: MemberRepository,
@@ -84,7 +82,7 @@ export class AccountsController {
       creatorUserId: req.user.sub,
     });
 
-    const account = await this.createAccountHandler.execute(command);
+    const account = await this.commandBus.execute(command);
     return this.mapToResponse(account);
   }
 
@@ -119,7 +117,7 @@ export class AccountsController {
       actor,
     });
 
-    const account = await this.updateAccountHandler.execute(command);
+    const account = await this.commandBus.execute(command);
     return this.mapToResponse(account);
   }
 }

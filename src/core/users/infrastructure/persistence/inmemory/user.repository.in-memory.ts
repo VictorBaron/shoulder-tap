@@ -8,21 +8,14 @@ export class UserRepositoryInMemory
 {
   async findByEmail(email: string): Promise<User | null> {
     const normalizedEmail = email.toLowerCase();
-    return Promise.resolve(
-      this.toArray().find((user) => user.getEmail() === normalizedEmail) ??
-        null,
-    );
+    return this.find((user) => user.getEmail() === normalizedEmail) ?? null;
   }
 
   async findByGoogleId(googleId: string): Promise<User | null> {
-    return Promise.resolve(
-      this.toArray().find((user) => user.getGoogleId() === googleId) ?? null,
-    );
+    return this.find((user) => user.getGoogleId() === googleId) ?? null;
   }
 
   async findBySlackId(slackId: string): Promise<User | null> {
-    return Promise.resolve(
-      this.toArray().find((user) => user.getSlackId() === slackId) ?? null,
-    );
+    return this.find((user) => user.getSlackId() === slackId) ?? null;
   }
 }

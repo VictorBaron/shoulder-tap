@@ -5,12 +5,12 @@ import type {
   MemberRole,
   MemberRoleLevel,
 } from '@/accounts/domain/value-objects';
-
+import { User } from '@/users/domain';
 import type { Member } from './member.aggregate';
 
 export interface MemberProps extends AggregateRootProps {
   accountId: string;
-  userId: string;
+  user: User;
   role: MemberRole;
   invitedAt: Date | null;
   activatedAt: Date | null;
@@ -21,13 +21,13 @@ export interface MemberProps extends AggregateRootProps {
 }
 
 export interface CreateMemberProps {
-  userId: string;
+  user: User;
   inviter: Member;
 }
 
 export interface CreateFounderMemberProps {
   accountId: string;
-  userId: string;
+  user: User;
 }
 
 export interface MemberJSON {

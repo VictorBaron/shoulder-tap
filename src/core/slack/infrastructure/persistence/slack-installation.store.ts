@@ -16,8 +16,8 @@ import { SlackInstallationMapper } from './mikro-orm/slack-installation.mapper';
 @Injectable()
 export class SlackInstallationStore implements InstallationStore {
   constructor(
-    private readonly repository: SlackInstallationRepository,
     private readonly commandBus: CommandBus,
+    private readonly repository: SlackInstallationRepository,
   ) {}
 
   async storeInstallation<AuthVersion extends 'v1' | 'v2'>(
@@ -41,6 +41,27 @@ export class SlackInstallationStore implements InstallationStore {
       rawInstallation: installation as unknown as Record<string, unknown>,
     };
 
+    await this.createOrUpdate({ fields });
+
+    if (!teamId) return;
+    if (!fields.botToken) return;
+
+    this.commandBus.execute(
+      new ProvisionAccountFromSlackCommand({
+        teamId,
+        teamName: fields.teamName ?? teamId,
+        botToken: fields.botToken,
+        installerSlackUserId: fields.userId,
+      }),
+    );
+  }
+
+  async createOrUpdate({
+    fields,
+  }: {
+    fields: CreateSlackInstallationProps;
+  }): Promise<SlackInstallation> {
+    const { teamId, enterpriseId } = fields;
     const existing = await this.repository.findByTeamAndEnterprise({
       teamId,
       enterpriseId,
@@ -49,23 +70,13 @@ export class SlackInstallationStore implements InstallationStore {
     if (existing) {
       existing.update(fields);
       await this.repository.save(existing);
-      return;
+      return existing;
     }
 
     const slackInstallation = SlackInstallation.create(fields);
 
     await this.repository.save(slackInstallation);
-
-    if (teamId && fields.botToken) {
-      this.commandBus.execute(
-        new ProvisionAccountFromSlackCommand({
-          teamId,
-          teamName: fields.teamName ?? teamId,
-          botToken: fields.botToken,
-          installerSlackUserId: fields.userId,
-        }),
-      );
-    }
+    return slackInstallation;
   }
 
   async fetchInstallation(

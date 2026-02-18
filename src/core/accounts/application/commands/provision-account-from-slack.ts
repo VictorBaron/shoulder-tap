@@ -1,5 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
-
+import { Inject } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
+import { BaseCommandHandler } from 'src/common/application/command-handler';
 import {
   Account,
   AccountRepository,
@@ -8,6 +9,7 @@ import {
 } from '@/accounts/domain';
 import {
   SLACK_USERS_GATEWAY,
+  SlackUserInfo,
   type SlackUsersGateway,
 } from '@/accounts/domain/gateways/slack-users.gateway';
 import { Channel, ChannelRepository } from '@/channels/domain';
@@ -28,8 +30,8 @@ export class ProvisionAccountFromSlackCommand {
   ) {}
 }
 
-@Injectable()
-export class ProvisionAccountFromSlackHandler {
+@CommandHandler(ProvisionAccountFromSlackCommand)
+export class ProvisionAccountFromSlackHandler extends BaseCommandHandler<ProvisionAccountFromSlackCommand> {
   constructor(
     private readonly accountRepository: AccountRepository,
     private readonly memberRepository: MemberRepository,
@@ -39,7 +41,9 @@ export class ProvisionAccountFromSlackHandler {
     private readonly slackUsersGateway: SlackUsersGateway,
     @Inject(SLACK_CHANNELS_GATEWAY)
     private readonly slackChannelsGateway: SlackChannelsGateway,
-  ) {}
+  ) {
+    super();
+  }
 
   async execute(command: ProvisionAccountFromSlackCommand): Promise<void> {
     const { teamId, teamName, botToken, installerSlackUserId } = command.props;
@@ -47,6 +51,7 @@ export class ProvisionAccountFromSlackHandler {
     const account = await this.findOrCreateAccount({ teamId, teamName });
 
     await this.importUsers({ account, botToken, installerSlackUserId });
+
     await this.importChannels({ account, botToken });
   }
 
@@ -61,6 +66,7 @@ export class ProvisionAccountFromSlackHandler {
     if (existing) return existing;
 
     const account = Account.create({ name: teamName, slackTeamId: teamId });
+
     await this.accountRepository.save(account);
     return account;
   }
@@ -77,29 +83,64 @@ export class ProvisionAccountFromSlackHandler {
     const slackUsers = await this.slackUsersGateway.listTeamMembers(botToken);
     const eligibleUsers = slackUsers.filter((u) => !u.isBot && !u.deleted);
 
+    this.logger.log(eligibleUsers);
+
+    const installerSlackUser = eligibleUsers.find(
+      (slackUser) => slackUser.slackId === installerSlackUserId,
+    );
+
+    if (!installerSlackUser) return;
+
+    const installer = await this.findOrCreateFounder(
+      installerSlackUser,
+      account,
+    );
+
     for (const slackUser of eligibleUsers) {
-      const user = await this.findOrCreateUser(slackUser);
-
-      const existingMember =
-        await this.memberRepository.findByAccountIdAndUserId({
-          accountId: account.getId(),
-          userId: user.getId(),
-        });
-      if (existingMember) continue;
-
-      const isInstaller = slackUser.slackId === installerSlackUserId;
-      const member = isInstaller
-        ? Member.createFounder({
-            accountId: account.getId(),
-            userId: user.getId(),
-          })
-        : Member.createActive({
-            accountId: account.getId(),
-            userId: user.getId(),
-          });
-
-      await this.memberRepository.save(member);
+      await this.findOrInviteMember(slackUser, installer);
     }
+  }
+
+  private async findOrCreateFounder(
+    installerSlackUser: SlackUserInfo,
+    account: Account,
+  ) {
+    const installerUser = await this.findOrCreateUser(installerSlackUser);
+
+    const existingMember = await this.memberRepository.findByAccountIdAndUserId(
+      {
+        accountId: account.getId(),
+        userId: installerUser.getId(),
+      },
+    );
+
+    if (existingMember) return existingMember;
+    const installer = Member.createFounder({
+      accountId: account.getId(),
+      user: installerUser,
+    });
+
+    await this.memberRepository.save(installer);
+    return installer;
+  }
+
+  private async findOrInviteMember(slackUser: SlackUserInfo, inviter: Member) {
+    const user = await this.findOrCreateUser(slackUser);
+
+    const existingMember = await this.memberRepository.findByAccountIdAndUserId(
+      {
+        accountId: inviter.getAccountId(),
+        userId: user.getId(),
+      },
+    );
+    if (existingMember) return existingMember;
+
+    const newMember = Member.invite({
+      inviter,
+      user,
+    });
+    await this.memberRepository.save(newMember);
+    return newMember;
   }
 
   private async importChannels({
@@ -111,6 +152,8 @@ export class ProvisionAccountFromSlackHandler {
   }): Promise<void> {
     const slackChannels =
       await this.slackChannelsGateway.listTeamChannels(botToken);
+
+    this.logger.log(slackChannels);
 
     for (const sc of slackChannels) {
       const existing = await this.channelRepository.findBySlackChannelId({
@@ -128,19 +171,19 @@ export class ProvisionAccountFromSlackHandler {
           memberCount: sc.memberCount,
         });
         await this.channelRepository.save(existing);
-      } else {
-        const channel = Channel.create({
-          accountId: account.getId(),
-          slackChannelId: sc.slackChannelId,
-          name: sc.name,
-          topic: sc.topic,
-          purpose: sc.purpose,
-          isPrivate: sc.isPrivate,
-          isArchived: sc.isArchived,
-          memberCount: sc.memberCount,
-        });
-        await this.channelRepository.save(channel);
+        continue;
       }
+      const channel = Channel.create({
+        accountId: account.getId(),
+        slackChannelId: sc.slackChannelId,
+        name: sc.name,
+        topic: sc.topic,
+        purpose: sc.purpose,
+        isPrivate: sc.isPrivate,
+        isArchived: sc.isArchived,
+        memberCount: sc.memberCount,
+      });
+      await this.channelRepository.save(channel);
     }
   }
 

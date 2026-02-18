@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-
+import { CommandHandler } from '@nestjs/cqrs';
+import { BaseCommandHandler } from 'src/common/application/command-handler';
 import { User, UserRepository } from '@/users/domain';
 
 export class CreateOAuthUserCommand {
@@ -12,9 +12,11 @@ export class CreateOAuthUserCommand {
   ) {}
 }
 
-@Injectable()
-export class CreateOAuthUserHandler {
-  constructor(private readonly repository: UserRepository) {}
+@CommandHandler(CreateOAuthUserCommand)
+export class CreateOAuthUserHandler extends BaseCommandHandler<CreateOAuthUserCommand> {
+  constructor(private readonly repository: UserRepository) {
+    super();
+  }
 
   async execute(command: CreateOAuthUserCommand): Promise<User> {
     const user = User.createOAuthUser({

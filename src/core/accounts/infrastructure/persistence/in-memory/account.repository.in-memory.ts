@@ -7,10 +7,8 @@ export class AccountRepositoryInMemory
   implements AccountRepository
 {
   findBySlackTeamId(teamId: string): Promise<Account | null> {
-    return Promise.resolve(
-      this.toArray().find(
-        (account) => account.toJSON().slackTeamId === teamId,
-      ) ?? null,
+    return (
+      this.find((account) => account.toJSON().slackTeamId === teamId) ?? null
     );
   }
 }

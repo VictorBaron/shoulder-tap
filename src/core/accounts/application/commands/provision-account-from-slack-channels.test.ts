@@ -8,7 +8,7 @@ import {
 } from '@/accounts/domain/gateways/slack-users.gateway';
 import { FakeSlackUsersGateway } from '@/accounts/infrastructure/gateways/fake-slack-users.gateway';
 import { AccountRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/account.repository.in-memory';
-import { InMemoryMemberRepository } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
+import { MemberRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
 import { ChannelFactory } from '@/channels/__tests__/factories/channel.factory';
 import { ChannelRepository } from '@/channels/domain';
 import {
@@ -50,7 +50,7 @@ const makeSlackChannel = (
 describe('Provision Account From Slack — Channel Import', () => {
   let handler: ProvisionAccountFromSlackHandler;
   let accountRepository: AccountRepositoryInMemory;
-  let memberRepository: InMemoryMemberRepository;
+  let memberRepository: MemberRepositoryInMemory;
   let userRepository: UserRepositoryInMemory;
   let slackUsersGateway: FakeSlackUsersGateway;
   let channelRepository: ChannelRepositoryInMemory;
@@ -61,7 +61,7 @@ describe('Provision Account From Slack — Channel Import', () => {
       providers: [
         ProvisionAccountFromSlackHandler,
         { provide: AccountRepository, useClass: AccountRepositoryInMemory },
-        { provide: MemberRepository, useClass: InMemoryMemberRepository },
+        { provide: MemberRepository, useClass: MemberRepositoryInMemory },
         { provide: UserRepository, useClass: UserRepositoryInMemory },
         { provide: SLACK_USERS_GATEWAY, useClass: FakeSlackUsersGateway },
         { provide: ChannelRepository, useClass: ChannelRepositoryInMemory },
@@ -75,7 +75,7 @@ describe('Provision Account From Slack — Channel Import', () => {
     handler = module.get(ProvisionAccountFromSlackHandler);
     accountRepository =
       module.get<AccountRepositoryInMemory>(AccountRepository);
-    memberRepository = module.get<InMemoryMemberRepository>(MemberRepository);
+    memberRepository = module.get<MemberRepositoryInMemory>(MemberRepository);
     userRepository = module.get<UserRepositoryInMemory>(UserRepository);
     slackUsersGateway = module.get<FakeSlackUsersGateway>(SLACK_USERS_GATEWAY);
     channelRepository =

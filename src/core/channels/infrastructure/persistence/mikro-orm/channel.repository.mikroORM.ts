@@ -19,7 +19,7 @@ export class ChannelRepositoryMikroOrm
 
   async findById(id: string): Promise<Channel | null> {
     const entity = await this.em.findOne(ChannelMikroOrm, { id });
-    return entity ? ChannelMapper.toDomain(entity) : null;
+    return this.mapToDomain(entity);
   }
 
   async findByAccountId(accountId: string): Promise<Channel[]> {
@@ -28,7 +28,7 @@ export class ChannelRepositoryMikroOrm
       { account: accountId },
       { orderBy: { name: 'ASC' } },
     );
-    return entities.map((e) => ChannelMapper.toDomain(e));
+    return this.mapArrayToDomain(entities);
   }
 
   async findBySlackChannelId({
@@ -42,6 +42,6 @@ export class ChannelRepositoryMikroOrm
       account: accountId,
       slackChannelId,
     });
-    return entity ? ChannelMapper.toDomain(entity) : null;
+    return this.mapToDomain(entity);
   }
 }

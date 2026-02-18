@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-
+import { NotFoundException } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
+import { BaseCommandHandler } from 'src/common/application/command-handler';
 import { User, UserRepository } from '@/users/domain';
 
 export class LinkGoogleAccountCommand {
@@ -12,9 +13,11 @@ export class LinkGoogleAccountCommand {
   ) {}
 }
 
-@Injectable()
-export class LinkGoogleAccountHandler {
-  constructor(private readonly repository: UserRepository) {}
+@CommandHandler(LinkGoogleAccountCommand)
+export class LinkGoogleAccountHandler extends BaseCommandHandler<LinkGoogleAccountCommand> {
+  constructor(private readonly repository: UserRepository) {
+    super();
+  }
 
   async execute(command: LinkGoogleAccountCommand): Promise<User> {
     const user = await this.repository.findById(command.props.userId);

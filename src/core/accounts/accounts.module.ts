@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 import { AuthModule } from 'auth/auth.module';
 
 import { ChannelsModule } from '@/channels/channels.module';
+import { SLACK_CHANNELS_GATEWAY } from '@/channels/domain/gateways/slack-channels.gateway';
+import { WebApiSlackChannelsGateway } from '@/channels/infrastructure/gateways/web-api-slack-channels.gateway';
 import { UserPersistenceModule } from '@/users/infrastructure';
-
 import { AccountsController } from './accounts.controller';
 import {
   AcceptInvitationHandler,
@@ -29,6 +31,7 @@ import { InvitationsController, MembersController } from './members.controller';
 
 @Module({
   imports: [
+    CqrsModule,
     AuthModule,
     AccountPersistenceModule.use('orm'),
     UserPersistenceModule.use('orm'),
@@ -46,17 +49,12 @@ import { InvitationsController, MembersController } from './members.controller';
     ChangeMemberRoleHandler,
     ProvisionAccountFromSlackHandler,
     { provide: SLACK_USERS_GATEWAY, useClass: WebApiSlackUsersGateway },
+    { provide: SLACK_CHANNELS_GATEWAY, useClass: WebApiSlackChannelsGateway },
     GetAccountByIdHandler,
     GetUserAccountsHandler,
     GetAccountMembersHandler,
     GetPendingInvitationsHandler,
   ],
-  exports: [
-    GetAccountByIdHandler,
-    GetUserAccountsHandler,
-    GetAccountMembersHandler,
-    GetPendingInvitationsHandler,
-    ProvisionAccountFromSlackHandler,
-  ],
+  exports: [],
 })
 export class AccountsModule {}

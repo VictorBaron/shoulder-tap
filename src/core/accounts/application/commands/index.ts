@@ -5,4 +5,4 @@ export * from './delete-account';
 export * from './disable-member';
 export * from './enable-member';
 export * from './invite-member';
-export * from './update-account.command';
+export * from './update-account';

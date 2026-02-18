@@ -7,9 +7,6 @@ export class MessageRepositoryInMemory
   implements MessageRepository
 {
   findBySlackTs(slackTs: string): Promise<Message | null> {
-    return Promise.resolve(
-      this.toArray().find((message) => message.toJSON().slackTs === slackTs) ??
-        null,
-    );
+    return this.find((message) => message.toJSON().slackTs === slackTs) ?? null;
   }
 }

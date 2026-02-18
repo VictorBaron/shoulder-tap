@@ -23,28 +23,26 @@ export class SlackInstallationRepositoryInMemory
     if (!teamId && enterpriseId) {
       return this.findByEnterpriseId(enterpriseId);
     }
-    return Promise.resolve(
-      this.toArray().find(
+    return (
+      this.find(
         (installation) =>
           installation.getTeamId() === teamId &&
           installation.getEnterpriseId() === enterpriseId,
-      ) ?? null,
+      ) ?? null
     );
   }
 
   findByTeamId(teamId: string): Promise<SlackInstallation | null> {
-    return Promise.resolve(
-      this.toArray().find(
-        (installation) => installation.getTeamId() === teamId,
-      ) ?? null,
+    return (
+      this.find((installation) => installation.getTeamId() === teamId) ?? null
     );
   }
 
   findByEnterpriseId(enterpriseId: string): Promise<SlackInstallation | null> {
-    return Promise.resolve(
-      this.toArray().find(
+    return (
+      this.find(
         (installation) => installation.getEnterpriseId() === enterpriseId,
-      ) ?? null,
+      ) ?? null
     );
   }
 

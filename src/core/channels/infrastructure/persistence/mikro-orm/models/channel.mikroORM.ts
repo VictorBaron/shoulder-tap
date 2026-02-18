@@ -6,7 +6,7 @@ import { AccountMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm
 @Entity({ tableName: 'channel' })
 @Unique({ properties: ['account', 'slackChannelId'] })
 export class ChannelMikroOrm extends PersistenceEntity {
-  @ManyToOne(() => AccountMikroOrm, { primary: true })
+  @ManyToOne(() => AccountMikroOrm)
   account?: AccountMikroOrm;
 
   @Property({ type: 'varchar', length: 255 })

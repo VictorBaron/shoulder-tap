@@ -2,46 +2,49 @@ import { RepositoryInMemory } from 'common/domain/repository.in-memory';
 
 import { Member, MemberRepository } from '@/accounts/domain';
 
-export class InMemoryMemberRepository
+export class MemberRepositoryInMemory
   extends RepositoryInMemory<Member>
   implements MemberRepository
 {
+  async findById(id: string): Promise<Member | null> {
+    return this.find((m) => m.getId() === id);
+  }
+
   async findByAccountId(accountId: string): Promise<Member[]> {
-    return Promise.resolve(
-      this.toArray().filter((m) => m.getAccountId() === accountId),
-    );
+    return this.filter((m) => m.getAccountId() === accountId);
   }
 
   async findByUserId(userId: string): Promise<Member[]> {
-    return Promise.resolve(
-      this.toArray().filter((m) => m.getUserId() === userId),
-    );
+    return this.filter((m) => m.getUserId() === userId);
+  }
+
+  async findByAccountIdAndSlackUserId({
+    accountId,
+    slackUserId,
+  }: {
+    accountId: string;
+    slackUserId: string;
+  }): Promise<Member | null> {
+    return this.find((m) => m.identify({ accountId, slackUserId }));
   }
 
   async findByAccountIdAndUserId(props: {
     accountId: string;
     userId: string;
   }): Promise<Member | null> {
-    return Promise.resolve(
-      this.toArray().find(
-        (m) =>
-          m.getAccountId() === props.accountId &&
-          m.getUserId() === props.userId,
-      ) ?? null,
+    return this.find(
+      (m) =>
+        m.getAccountId() === props.accountId && m.getUserId() === props.userId,
     );
   }
 
   async findPendingByUserId(userId: string): Promise<Member[]> {
-    return Promise.resolve(
-      this.toArray().filter((m) => m.getUserId() === userId && m.isPending()),
-    );
+    return this.filter((m) => m.getUserId() === userId && m.isPending());
   }
 
   async findActiveAdminsByAccountId(accountId: string): Promise<Member[]> {
-    return Promise.resolve(
-      this.toArray().filter(
-        (m) => m.getAccountId() === accountId && m.isAdmin() && m.isActive(),
-      ),
+    return this.filter(
+      (m) => m.getAccountId() === accountId && m.isAdmin() && m.isActive(),
     );
   }
 }

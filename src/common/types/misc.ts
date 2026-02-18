@@ -26,9 +26,14 @@ export type OwnProperties<E extends PersistenceEntity> = Omit<
 >;
 
 export type OwnPersistenceEntityProperties<E extends PersistenceEntity> =
-  OwnProperties<E> & {
+  Properties<E> & {
     id: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;
   };
+
+export type Properties<E extends PersistenceEntity> = Omit<
+  E,
+  keyof PersistenceEntity | ReadonlyKeys<E>
+>;

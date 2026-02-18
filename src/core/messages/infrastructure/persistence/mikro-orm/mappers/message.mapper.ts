@@ -1,3 +1,6 @@
+import { rel } from '@mikro-orm/core';
+import { AccountMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/account.mikroORM';
+import { MemberMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/member.mikroORM';
 import { Message } from '@/messages/domain';
 import { MessageMikroOrm } from '@/messages/infrastructure/persistence/mikro-orm/models';
 
@@ -24,6 +27,18 @@ export class MessageMapper {
 
   static toPersistence(message: Message): MessageMikroOrm {
     const json = message.toJSON();
-    return MessageMikroOrm.build({ ...json });
+    return MessageMikroOrm.build({
+      id: json.id,
+      createdAt: json.createdAt,
+      updatedAt: json.updatedAt,
+      deletedAt: json.deletedAt,
+      account: rel(AccountMikroOrm, json.accountId),
+      sender: rel(MemberMikroOrm, json.senderId),
+      slackTs: json.slackTs,
+      slackChannelId: json.slackChannelId,
+      slackChannelType: json.slackChannelType,
+      slackThreadTs: json.slackThreadTs,
+      text: json.text,
+    });
   }
 }

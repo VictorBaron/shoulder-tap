@@ -1,11 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 
-import {
-  CreateUserCommand,
-  CreateUserHandler,
-} from '@/users/application/commands';
+import { CreateUserCommand } from '@/users/application/commands';
 import {
   GetUserByEmailHandler,
   GetUserByEmailQuery,
@@ -15,14 +13,14 @@ import type { User, UserJSON } from '@/users/domain';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly createUserHandler: CreateUserHandler,
+    private readonly commandBus: CommandBus,
     private readonly getUserByEmailHandler: GetUserByEmailHandler,
     private readonly jwt: JwtService,
   ) {}
 
   async register(email: string, password: string) {
     const hash = await argon2.hash(password);
-    const user = await this.createUserHandler.execute(
+    const user = await this.commandBus.execute(
       new CreateUserCommand({ email, password: hash }),
     );
     return { id: user.getId(), email: user.getEmail() };

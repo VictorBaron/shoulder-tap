@@ -9,7 +9,7 @@ import {
   MemberRepository,
 } from '@/accounts/domain';
 import { MemberRole, MemberRoleLevel } from '@/accounts/domain/value-objects';
-import { InMemoryMemberRepository } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
+import { MemberRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
 import { UserFactory } from '@/users/__tests__/factories/user.factory';
 import { Email, type User, UserRepository } from '@/users/domain';
 import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
@@ -18,10 +18,11 @@ import { InviteMemberCommand, InviteMemberHandler } from './invite-member';
 
 describe('Invite member', () => {
   let handler: InviteMemberHandler;
-  let memberRepository: InMemoryMemberRepository;
+  let memberRepository: MemberRepositoryInMemory;
   let userRepository: UserRepositoryInMemory;
 
   let inviter: Member;
+  let inviterUser: User;
 
   beforeEach(async () => {
     jest.useFakeTimers().setSystemTime(new Date('2026-01-01'));
@@ -29,24 +30,26 @@ describe('Invite member', () => {
     const module = await Test.createTestingModule({
       providers: [
         InviteMemberHandler,
-        { provide: MemberRepository, useClass: InMemoryMemberRepository },
+        { provide: MemberRepository, useClass: MemberRepositoryInMemory },
         { provide: UserRepository, useClass: UserRepositoryInMemory },
       ],
     }).compile();
 
     handler = module.get<InviteMemberHandler>(InviteMemberHandler);
 
-    memberRepository = module.get<InMemoryMemberRepository>(MemberRepository);
+    memberRepository = module.get<MemberRepositoryInMemory>(MemberRepository);
     userRepository = module.get<UserRepositoryInMemory>(UserRepository);
 
+    inviterUser = UserFactory.create({ id: 'inviterUserId' });
     inviter = MemberFactory.createAdmin({
       id: 'inviterId',
-      userId: 'inviterUserId',
+      user: inviterUser,
     });
 
     memberRepository.clear();
     userRepository.clear();
     await memberRepository.save(inviter);
+    await userRepository.save(inviterUser);
   });
 
   afterEach(() => {
@@ -85,7 +88,7 @@ describe('Invite member', () => {
     it('should throw ForbiddenException', async () => {
       inviter = MemberFactory.create({
         id: 'inviterId',
-        userId: 'inviterUserId',
+        user: inviterUser,
         role: MemberRole.create(MemberRoleLevel.USER),
       });
       await memberRepository.save(inviter);
@@ -108,7 +111,7 @@ describe('Invite member', () => {
     it('should throw ForbiddenException when inviter is pending', async () => {
       inviter = MemberFactory.create({
         id: 'inviterId',
-        userId: 'inviterUserId',
+        user: inviterUser,
         role: MemberRole.create(MemberRoleLevel.ADMIN),
         activatedAt: null,
       });
@@ -130,7 +133,7 @@ describe('Invite member', () => {
     it('should throw ForbiddenException when inviter is disabled', async () => {
       inviter = MemberFactory.create({
         id: 'inviterId',
-        userId: 'inviterUserId',
+        user: inviterUser,
         role: MemberRole.create(MemberRoleLevel.ADMIN),
         activatedAt: new Date(),
         disabledAt: new Date(),
@@ -168,7 +171,7 @@ describe('Invite member', () => {
       it('should throw ConflictException', async () => {
         const existingMember = MemberFactory.create({
           accountId: 'accountId',
-          userId: existingUser.id,
+          user: existingUser,
           activatedAt: new Date(),
         });
 
@@ -192,7 +195,7 @@ describe('Invite member', () => {
       it('should send another invitation', async () => {
         const existingMember = MemberFactory.create({
           accountId: 'accountId',
-          userId: existingUser.id,
+          user: existingUser,
           activatedAt: null,
           invitedAt: new Date('2025-01-01'),
         });
@@ -230,7 +233,7 @@ describe('Invite member', () => {
       it('should enable and re-invite the user if it is disabled', async () => {
         const existingMember = MemberFactory.create({
           accountId: 'accountId',
-          userId: existingUser.id,
+          user: existingUser,
           activatedAt: new Date('2025-06-01'),
           disabledAt: new Date('2025-06-02'),
           invitedAt: new Date('2025-01-01'),

@@ -9,20 +9,16 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
 import { CookieAuthGuard } from 'auth/cookie-auth.guard';
 import type { Request } from 'express';
 
 import {
   AcceptInvitationCommand,
-  AcceptInvitationHandler,
   ChangeMemberRoleCommand,
-  ChangeMemberRoleHandler,
   DisableMemberCommand,
-  DisableMemberHandler,
   EnableMemberCommand,
-  EnableMemberHandler,
   InviteMemberCommand,
-  InviteMemberHandler,
 } from './application/commands';
 import {
   GetAccountMembersHandler,
@@ -46,11 +42,7 @@ interface AuthRequest extends Request {
 @UseGuards(CookieAuthGuard)
 export class MembersController {
   constructor(
-    private readonly inviteMemberHandler: InviteMemberHandler,
-    private readonly acceptInvitationHandler: AcceptInvitationHandler,
-    private readonly disableMemberHandler: DisableMemberHandler,
-    private readonly enableMemberHandler: EnableMemberHandler,
-    private readonly changeMemberRoleHandler: ChangeMemberRoleHandler,
+    private readonly commandBus: CommandBus,
     private readonly getAccountMembersHandler: GetAccountMembersHandler,
     private readonly memberRepository: MemberRepository,
   ) {}
@@ -112,7 +104,7 @@ export class MembersController {
       email: dto.email,
     });
 
-    const member = await this.inviteMemberHandler.execute(command);
+    const member = await this.commandBus.execute(command);
     return this.mapToResponse(member);
   }
 
@@ -150,7 +142,7 @@ export class MembersController {
       actor,
     });
 
-    const member = await this.acceptInvitationHandler.execute(command);
+    const member = await this.commandBus.execute(command);
     return this.mapToResponse(member);
   }
 
@@ -170,7 +162,7 @@ export class MembersController {
       actor,
     });
 
-    const member = await this.changeMemberRoleHandler.execute(command);
+    const member = await this.commandBus.execute(command);
     return this.mapToResponse(member);
   }
 
@@ -188,7 +180,7 @@ export class MembersController {
       actor,
     });
 
-    const member = await this.disableMemberHandler.execute(command);
+    const member = await this.commandBus.execute(command);
     return this.mapToResponse(member);
   }
 
@@ -206,7 +198,7 @@ export class MembersController {
       actor,
     });
 
-    const member = await this.enableMemberHandler.execute(command);
+    const member = await this.commandBus.execute(command);
     return this.mapToResponse(member);
   }
 }

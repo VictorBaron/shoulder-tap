@@ -19,6 +19,10 @@ export abstract class AggregateRoot<
     this.domainEvents.push(...events);
   }
 
+  public getId(): string {
+    return this.id;
+  }
+
   public findEvents<EventType extends IDomainEvent>(
     // biome-ignore lint/suspicious/noExplicitAny: Args could be anything
     eventType: new (...args: any[]) => EventType,

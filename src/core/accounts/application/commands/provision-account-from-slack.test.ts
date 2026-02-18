@@ -1,6 +1,5 @@
 import { Test } from '@nestjs/testing';
 
-// biome-ignore lint/style/useImportType: needed for NestJS DI
 import { AccountFactory } from '@/accounts/__tests__/factories/account.factory';
 import { MemberFactory } from '@/accounts/__tests__/factories/member.factory';
 import { AccountRepository, MemberRepository } from '@/accounts/domain';
@@ -11,12 +10,12 @@ import {
 import { MemberRole, MemberRoleLevel } from '@/accounts/domain/value-objects';
 import { FakeSlackUsersGateway } from '@/accounts/infrastructure/gateways/fake-slack-users.gateway';
 import { AccountRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/account.repository.in-memory';
-import { InMemoryMemberRepository } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
+import { MemberRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
 import { ChannelRepository } from '@/channels/domain';
 import { SLACK_CHANNELS_GATEWAY } from '@/channels/domain/gateways/slack-channels.gateway';
 import { FakeSlackChannelsGateway } from '@/channels/infrastructure/gateways/fake-slack-channels.gateway';
 import { ChannelRepositoryInMemory } from '@/channels/infrastructure/persistence/in-memory/channel.repository.in-memory';
-import { Email, User, UserRepository } from '@/users/domain';
+import { User, UserRepository } from '@/users/domain';
 import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
 
 import {
@@ -36,7 +35,7 @@ const makeSlackUser = (overrides?: Partial<SlackUserInfo>): SlackUserInfo => ({
 describe('Provision Account From Slack', () => {
   let handler: ProvisionAccountFromSlackHandler;
   let accountRepository: AccountRepositoryInMemory;
-  let memberRepository: InMemoryMemberRepository;
+  let memberRepository: MemberRepositoryInMemory;
   let userRepository: UserRepositoryInMemory;
   let slackUsersGateway: FakeSlackUsersGateway;
 
@@ -45,7 +44,7 @@ describe('Provision Account From Slack', () => {
       providers: [
         ProvisionAccountFromSlackHandler,
         { provide: AccountRepository, useClass: AccountRepositoryInMemory },
-        { provide: MemberRepository, useClass: InMemoryMemberRepository },
+        { provide: MemberRepository, useClass: MemberRepositoryInMemory },
         { provide: UserRepository, useClass: UserRepositoryInMemory },
         { provide: ChannelRepository, useClass: ChannelRepositoryInMemory },
         { provide: SLACK_USERS_GATEWAY, useClass: FakeSlackUsersGateway },
@@ -56,7 +55,7 @@ describe('Provision Account From Slack', () => {
     handler = module.get(ProvisionAccountFromSlackHandler);
     accountRepository =
       module.get<AccountRepositoryInMemory>(AccountRepository);
-    memberRepository = module.get<InMemoryMemberRepository>(MemberRepository);
+    memberRepository = module.get<MemberRepositoryInMemory>(MemberRepository);
     userRepository = module.get<UserRepositoryInMemory>(UserRepository);
     slackUsersGateway = module.get<FakeSlackUsersGateway>(SLACK_USERS_GATEWAY);
 
@@ -120,7 +119,7 @@ describe('Provision Account From Slack', () => {
       expect(founderMember.isActive()).toBe(true);
     });
 
-    it('should create a User and an active Member for each non-bot, non-deleted team member', async () => {
+    it('should create a User and an inactive Member for each non-bot, non-deleted team member', async () => {
       slackUsersGateway.setUsers([
         makeSlackUser({
           slackId: 'U_INSTALLER',
@@ -160,14 +159,14 @@ describe('Provision Account From Slack', () => {
       expect(aliceMember?.toJSON()).toMatchObject({
         role: MemberRoleLevel.USER,
       });
-      expect(aliceMember?.isActive()).toBe(true);
+      expect(aliceMember?.isActive()).toBe(false);
 
       const bob = await userRepository.findBySlackId('U003');
       const bobMember = members.find((m) => m.toJSON().userId === bob!.getId());
       expect(bobMember?.toJSON()).toMatchObject({
         role: MemberRoleLevel.USER,
       });
-      expect(bobMember?.isActive()).toBe(true);
+      expect(bobMember?.isActive()).toBe(false);
     });
 
     it('should skip bot users', async () => {
@@ -333,6 +332,11 @@ describe('Provision Account From Slack', () => {
 
       slackUsersGateway.setUsers([
         makeSlackUser({
+          slackId: 'U_INSTALLER',
+          email: 'installer@example.com',
+          name: 'Installer',
+        }),
+        makeSlackUser({
           slackId: 'U_NEW',
           email: 'newuser@example.com',
           name: 'New User',
@@ -380,7 +384,7 @@ describe('Provision Account From Slack', () => {
 
       const existingMember = MemberFactory.create({
         accountId: existingAccount.getId(),
-        userId: existingUser.getId(),
+        user: existingUser,
       });
       await memberRepository.save(existingMember);
 
@@ -425,7 +429,7 @@ describe('Provision Account From Slack', () => {
 
       const adminMember = MemberFactory.createAdmin({
         accountId: existingAccount.getId(),
-        userId: adminUser.getId(),
+        user: adminUser,
         role: MemberRole.admin,
       });
       await memberRepository.save(adminMember);

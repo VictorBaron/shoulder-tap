@@ -1,4 +1,5 @@
 import { Entity, Index, ManyToOne, Property } from '@mikro-orm/core';
+import { GenericMessageEvent } from '@slack/types';
 import { PersistenceEntity } from 'common/persistence-entity';
 import type { OwnPersistenceEntityProperties } from 'common/types/misc';
 import {
@@ -8,10 +9,10 @@ import {
 
 @Entity({ tableName: 'message' })
 export class MessageMikroOrm extends PersistenceEntity {
-  @ManyToOne(() => AccountMikroOrm, { primary: true })
+  @ManyToOne(() => AccountMikroOrm)
   account?: AccountMikroOrm;
 
-  @ManyToOne(() => MemberMikroOrm, { primary: true })
+  @ManyToOne(() => MemberMikroOrm)
   sender?: MemberMikroOrm;
 
   @Property({ type: 'varchar', length: 64 })
@@ -22,7 +23,7 @@ export class MessageMikroOrm extends PersistenceEntity {
   slackChannelId: string;
 
   @Property({ type: 'varchar', length: 32 })
-  slackChannelType: string;
+  slackChannelType: GenericMessageEvent['channel_type'];
 
   @Property({ type: 'varchar', length: 64, nullable: true })
   slackThreadTs: string | null;

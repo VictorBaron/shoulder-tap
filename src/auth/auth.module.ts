@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
@@ -13,6 +14,7 @@ import { GoogleAuthGuard } from './google-auth.guard';
 
 @Module({
   imports: [
+    CqrsModule,
     forwardRef(() => UsersModule),
     PassportModule.register({ defaultStrategy: 'google' }),
     JwtModule.registerAsync({

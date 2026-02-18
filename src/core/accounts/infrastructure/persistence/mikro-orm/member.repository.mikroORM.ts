@@ -14,67 +14,80 @@ import { MemberMikroOrm } from './models';
 
 @Injectable()
 export class MemberRepositoryMikroOrm
-  extends RepositoryMikroORM<Member, MemberMikroOrm>
+  extends RepositoryMikroORM<Member, MemberMikroOrm, 'user'>
   implements MemberRepository
 {
+  protected override readonly defaultPopulate = ['user'] as const;
+
   constructor(em: EntityManager, eventBus: EventBus) {
     super(em, eventBus, MemberMapper, MemberMikroOrm);
   }
 
   async findById(id: string): Promise<Member | null> {
-    const entity = await this.em.findOne(MemberMikroOrm, { id });
-    return entity ? MemberMapper.toDomain(entity) : null;
+    const entity = await this.findOne({ id });
+    return this.mapToDomain(entity);
   }
 
   async findByAccountId(accountId: string): Promise<Member[]> {
-    const entities = await this.em.find(
-      MemberMikroOrm,
-      { accountId },
+    const entities = await this.find(
+      { account: accountId },
       { orderBy: { createdAt: 'ASC' } },
     );
-    return entities.map((e) => MemberMapper.toDomain(e));
+    return this.mapArrayToDomain(entities);
+  }
+
+  async findByAccountIdAndSlackUserId({
+    accountId,
+    slackUserId,
+  }: {
+    accountId: string;
+    slackUserId: string;
+  }): Promise<Member | null> {
+    const entity = await this.findOne({
+      account: accountId,
+      user: { slackId: slackUserId },
+    });
+    return this.mapToDomain(entity);
   }
 
   async findByUserId(userId: string): Promise<Member[]> {
-    const entities = await this.em.find(
-      MemberMikroOrm,
-      { userId },
+    const entities = await this.find(
+      { user: userId },
       { orderBy: { createdAt: 'ASC' } },
     );
-    return entities.map((e) => MemberMapper.toDomain(e));
+    return this.mapArrayToDomain(entities);
   }
 
   async findByAccountIdAndUserId(props: {
     accountId: string;
     userId: string;
   }): Promise<Member | null> {
-    const entity = await this.em.findOne(MemberMikroOrm, {
-      accountId: props.accountId,
-      userId: props.userId,
+    const entity = await this.findOne({
+      account: props.accountId,
+      user: props.userId,
     });
-    return entity ? MemberMapper.toDomain(entity) : null;
+    return this.mapToDomain(entity);
   }
 
   async findPendingByUserId(userId: string): Promise<Member[]> {
-    const entities = await this.em.find(
-      MemberMikroOrm,
+    const entities = await this.find(
       {
-        userId,
+        user: userId,
         activatedAt: null,
         disabledAt: null,
       },
       { orderBy: { invitedAt: 'DESC' } },
     );
-    return entities.map((e) => MemberMapper.toDomain(e));
+    return this.mapArrayToDomain(entities);
   }
 
   async findActiveAdminsByAccountId(accountId: string): Promise<Member[]> {
-    const entities = await this.em.find(MemberMikroOrm, {
-      accountId,
+    const entities = await this.find({
+      account: accountId,
       role: MemberRoleLevel.ADMIN,
       activatedAt: { $ne: null },
       disabledAt: null,
     });
-    return entities.map((e) => MemberMapper.toDomain(e));
+    return this.mapArrayToDomain(entities);
   }
 }

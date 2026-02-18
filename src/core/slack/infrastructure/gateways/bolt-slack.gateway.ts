@@ -3,13 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { CommandBus } from '@nestjs/cqrs';
 import { App, ExpressReceiver, type InstallationStore } from '@slack/bolt';
 import type { Application } from 'express';
-
-import { AccountRepository } from '@/accounts/domain';
 import { FilterIncomingMessageCommand } from '@/messages/application/commands/filter-incoming-message';
+import { FilterIncomingReactionCommand } from '@/messages/application/commands/filter-incoming-reaction';
 import { SlackGateway } from '@/slack/domain/slack.gateway';
 import { INSTALLATION_STORE } from '@/slack/infrastructure/persistence/installation-store.token';
 import { isGenericMessage } from '@/slack/types';
-import { UserRepository } from '@/users/domain/repositories/user.repository';
 
 const SLACK_SCOPES = [
   'chat:write',
@@ -17,6 +15,8 @@ const SLACK_SCOPES = [
   'users:read',
   'users:read.email',
   'reactions:read',
+  'channels:read',
+  'groups:read',
 ] as const;
 
 const USER_SCOPES = [
@@ -43,10 +43,6 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
     private commandBus: CommandBus,
     @Inject(INSTALLATION_STORE)
     private installationStore: InstallationStore,
-    @Inject(AccountRepository)
-    private accountRepository: AccountRepository,
-    @Inject(UserRepository)
-    private userRepository: UserRepository,
   ) {
     this.receiver = new ExpressReceiver({
       signingSecret: this.config.getOrThrow('SLACK_SIGNING_SECRET'),
@@ -77,38 +73,22 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
 
   private registerEventHandlers() {
     this.bolt.event('message', async ({ event }) => {
-      if (!isGenericMessage(event)) return;
-
-      const account = await this.accountRepository.findBySlackTeamId(
-        event.team!,
-      );
-      if (!account) {
-        this.logger.warn(`No account found for Slack team ${event.team}`);
-        return;
-      }
-
-      const user = await this.userRepository.findBySlackId(event.user);
-      if (!user) {
-        this.logger.warn(`No user found for Slack user ${event.user}`);
+      if (!isGenericMessage(event)) {
+        this.logger.log(`Received non generic message of type ${event.type}`);
         return;
       }
 
       await this.commandBus.execute(
         new FilterIncomingMessageCommand({
-          accountId: account.getId(),
-          senderId: user.getId(),
-          message: event,
+          messageEvent: event,
         }),
       );
     });
 
     this.bolt.event('reaction_added', async ({ event }) => {
-      console.log(event);
-      await Promise.resolve(
-        console.log('Reaction added:', {
-          user: event.user,
-          reaction: event.reaction,
-          itemUser: event.item_user,
+      await this.commandBus.execute(
+        new FilterIncomingReactionCommand({
+          reactionEvent: event,
         }),
       );
     });

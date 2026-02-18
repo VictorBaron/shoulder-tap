@@ -58,12 +58,12 @@ export class Account extends AggregateRoot {
     this.addDomainEvent(new AccountUpdatedEvent(this.id));
   }
 
-  getId(): string {
-    return this.id;
-  }
-
   getName(): string {
     return this.name;
+  }
+
+  get isActive(): boolean {
+    return true;
   }
 
   toJSON(): AccountJSON {

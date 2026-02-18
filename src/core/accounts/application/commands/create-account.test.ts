@@ -10,31 +10,37 @@ import {
 } from '@/accounts/domain';
 import { MemberRoleLevel } from '@/accounts/domain/value-objects';
 import { AccountRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/account.repository.in-memory';
-import { InMemoryMemberRepository } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
-
+import { MemberRepositoryInMemory } from '@/accounts/infrastructure/persistence/in-memory/member.repository.in-memory';
+import { UserFactory } from '@/users/__tests__/factories/user.factory';
+import { UserRepository } from '@/users/domain';
+import { UserRepositoryInMemory } from '@/users/infrastructure/persistence/inmemory/user.repository.in-memory';
 import { CreateAccountCommand, CreateAccountHandler } from './create-account';
 
 describe('Create Account', () => {
   let handler: CreateAccountHandler;
   let accountRepository: AccountRepositoryInMemory;
-  let memberRepository: InMemoryMemberRepository;
+  let memberRepository: MemberRepositoryInMemory;
+  let userRepository: UserRepositoryInMemory;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
         CreateAccountHandler,
         { provide: AccountRepository, useClass: AccountRepositoryInMemory },
-        { provide: MemberRepository, useClass: InMemoryMemberRepository },
+        { provide: MemberRepository, useClass: MemberRepositoryInMemory },
+        { provide: UserRepository, useClass: UserRepositoryInMemory },
       ],
     }).compile();
 
     handler = module.get<CreateAccountHandler>(CreateAccountHandler);
     accountRepository =
       module.get<AccountRepositoryInMemory>(AccountRepository);
-    memberRepository = module.get<InMemoryMemberRepository>(MemberRepository);
+    memberRepository = module.get<MemberRepositoryInMemory>(MemberRepository);
+    userRepository = module.get<UserRepositoryInMemory>(UserRepository);
 
     accountRepository.clear();
     memberRepository.clear();
+    userRepository.save(UserFactory.create({ id: 'user-abc' }));
   });
 
   describe('when valid props are provided', () => {

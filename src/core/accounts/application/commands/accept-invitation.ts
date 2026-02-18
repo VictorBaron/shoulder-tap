@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-
+import { NotFoundException } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
+import { BaseCommandHandler } from 'src/common/application/command-handler';
 import { Member, MemberRepository } from '@/accounts/domain';
 
 export class AcceptInvitationCommand {
@@ -11,9 +12,11 @@ export class AcceptInvitationCommand {
   ) {}
 }
 
-@Injectable()
-export class AcceptInvitationHandler {
-  constructor(private readonly memberRepository: MemberRepository) {}
+@CommandHandler(AcceptInvitationCommand)
+export class AcceptInvitationHandler extends BaseCommandHandler<AcceptInvitationCommand> {
+  constructor(private readonly memberRepository: MemberRepository) {
+    super();
+  }
 
   async execute(command: AcceptInvitationCommand): Promise<Member> {
     const { actor } = command.props;

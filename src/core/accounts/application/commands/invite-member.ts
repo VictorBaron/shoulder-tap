@@ -1,5 +1,6 @@
-import { ConflictException, Injectable } from '@nestjs/common';
-
+import { ConflictException } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
+import { BaseCommandHandler } from 'src/common/application/command-handler';
 import { Member, MemberRepository } from '@/accounts/domain';
 import { User, UserRepository } from '@/users/domain';
 
@@ -12,12 +13,14 @@ export class InviteMemberCommand {
   ) {}
 }
 
-@Injectable()
-export class InviteMemberHandler {
+@CommandHandler(InviteMemberCommand)
+export class InviteMemberHandler extends BaseCommandHandler<InviteMemberCommand> {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly memberRepository: MemberRepository,
-  ) {}
+  ) {
+    super();
+  }
 
   async execute(command: InviteMemberCommand): Promise<Member> {
     const { actor, email } = command.props;
@@ -35,7 +38,7 @@ export class InviteMemberHandler {
     if (!existingMember) {
       const member = Member.invite({
         inviter: actor,
-        userId: user.id,
+        user,
       });
 
       await this.memberRepository.save(member);

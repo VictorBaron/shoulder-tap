@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
-
+import { CommandHandler } from '@nestjs/cqrs';
+import { BaseCommandHandler } from 'src/common/application/command-handler';
 import {
   Account,
   AccountRepository,
   Member,
   MemberRepository,
 } from '@/accounts/domain';
+import { UserRepository } from '@/users/domain';
 
 export class CreateAccountCommand {
   constructor(
@@ -17,12 +18,15 @@ export class CreateAccountCommand {
   ) {}
 }
 
-@Injectable()
-export class CreateAccountHandler {
+@CommandHandler(CreateAccountCommand)
+export class CreateAccountHandler extends BaseCommandHandler<CreateAccountCommand> {
   constructor(
     private readonly accountRepository: AccountRepository,
     private readonly memberRepository: MemberRepository,
-  ) {}
+    private readonly userRepository: UserRepository,
+  ) {
+    super();
+  }
 
   async execute(command: CreateAccountCommand): Promise<Account> {
     const { name, creatorUserId, slackTeamId } = command.props;
@@ -32,9 +36,17 @@ export class CreateAccountHandler {
       slackTeamId,
     });
 
+    const creatorUser = await this.userRepository.findById(creatorUserId);
+    if (!creatorUser) {
+      this.logger.error(
+        `Could not find creator user when creating account: ${JSON.stringify(command.props)}`,
+      );
+      throw new Error('Could not find creator user when creating account');
+    }
+
     const founder = Member.createFounder({
       accountId: account.getId(),
-      userId: creatorUserId,
+      user: creatorUser,
     });
 
     await this.accountRepository.save(account);

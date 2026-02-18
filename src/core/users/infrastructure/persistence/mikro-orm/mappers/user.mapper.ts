@@ -1,5 +1,5 @@
 import { Email, User, type UserJSON } from '@/users/domain';
-import { UserMikroOrm } from '@/users/infrastructure/persistence/mikro-orm';
+import { UserMikroOrm } from '../models/user.mikroORM';
 
 export class UserMapper {
   static toDomain(raw: UserMikroOrm): User {

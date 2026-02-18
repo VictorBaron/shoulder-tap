@@ -4,13 +4,14 @@ import {
   type MemberProps,
   MemberRole,
 } from '@/accounts/domain';
+import { UserFactory } from '@/users/__tests__/factories/user.factory';
 
 export class MemberFactory {
   static create(overrides?: Partial<MemberProps>): Member {
     return Member.reconstitute({
       id: 'memberId',
       accountId: 'accountId',
-      userId: 'userId',
+      user: UserFactory.create({ id: 'userId' }),
       role: MemberRole.user,
       invitedAt: null,
       activatedAt: new Date('2026-01-02'),

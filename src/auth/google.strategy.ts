@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { CommandBus } from '@nestjs/cqrs';
 import { PassportStrategy } from '@nestjs/passport';
 import {
   type Profile,
@@ -9,9 +10,7 @@ import {
 
 import {
   CreateOAuthUserCommand,
-  CreateOAuthUserHandler,
   LinkGoogleAccountCommand,
-  LinkGoogleAccountHandler,
 } from '@/users/application/commands';
 import {
   GetUserByEmailHandler,
@@ -24,10 +23,9 @@ import {
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     readonly config: ConfigService,
+    private readonly commandBus: CommandBus,
     private readonly getUserByGoogleIdHandler: GetUserByGoogleIdHandler,
     private readonly getUserByEmailHandler: GetUserByEmailHandler,
-    private readonly createOAuthUserHandler: CreateOAuthUserHandler,
-    private readonly linkGoogleAccountHandler: LinkGoogleAccountHandler,
   ) {
     super({
       clientID: config.get<string>('GOOGLE_CLIENT_ID')!,
@@ -80,7 +78,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     );
 
     if (userByEmail) {
-      return this.linkGoogleAccountHandler.execute(
+      return this.commandBus.execute(
         new LinkGoogleAccountCommand({
           userId: userByEmail.getId(),
           googleId,
@@ -89,7 +87,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       );
     }
 
-    return this.createOAuthUserHandler.execute(
+    return this.commandBus.execute(
       new CreateOAuthUserCommand({
         email,
         googleId,

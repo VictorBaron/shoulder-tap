@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-
+import { CommandHandler } from '@nestjs/cqrs';
+import { BaseCommandHandler } from 'src/common/application/command-handler';
 import { User, UserRepository } from '@/users/domain';
 
 export class CreateUserCommand {
@@ -11,9 +11,11 @@ export class CreateUserCommand {
   ) {}
 }
 
-@Injectable()
-export class CreateUserHandler {
-  constructor(private readonly repository: UserRepository) {}
+@CommandHandler(CreateUserCommand)
+export class CreateUserHandler extends BaseCommandHandler<CreateUserCommand> {
+  constructor(private readonly repository: UserRepository) {
+    super();
+  }
 
   async execute(command: CreateUserCommand): Promise<User> {
     const existingUser = await this.repository.findByEmail(command.props.email);

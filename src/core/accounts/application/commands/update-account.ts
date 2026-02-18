@@ -1,9 +1,6 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { CommandHandler } from '@nestjs/cqrs';
+import { BaseCommandHandler } from 'src/common/application/command-handler';
 import { Account, AccountRepository, Member } from '@/accounts/domain';
 
 export class UpdateAccountCommand {
@@ -16,9 +13,11 @@ export class UpdateAccountCommand {
   ) {}
 }
 
-@Injectable()
-export class UpdateAccountHandler {
-  constructor(private readonly accountRepository: AccountRepository) {}
+@CommandHandler(UpdateAccountCommand)
+export class UpdateAccountHandler extends BaseCommandHandler<UpdateAccountCommand> {
+  constructor(private readonly accountRepository: AccountRepository) {
+    super();
+  }
 
   async execute(command: UpdateAccountCommand): Promise<Account> {
     const { accountId, name, actor } = command.props;

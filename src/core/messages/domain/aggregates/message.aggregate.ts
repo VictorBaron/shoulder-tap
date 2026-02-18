@@ -1,7 +1,6 @@
+import { GenericMessageEvent } from '@slack/types';
 import { AggregateRoot } from 'common/domain';
-
 import { MessageCreatedEvent } from '@/messages/domain/events';
-
 import type {
   CreateMessageProps,
   MessageJSON,
@@ -13,7 +12,7 @@ export class Message extends AggregateRoot {
   private senderId: string;
   private slackTs: string;
   private slackChannelId: string;
-  private slackChannelType: string;
+  private slackChannelType: GenericMessageEvent['channel_type'];
   private slackThreadTs: string | null;
   private text: string | null;
 
@@ -38,8 +37,8 @@ export class Message extends AggregateRoot {
 
     const message = new Message({
       id: crypto.randomUUID(),
-      accountId: props.accountId,
-      senderId: props.senderId,
+      accountId: props.sender.getAccountId(),
+      senderId: props.sender.getId(),
       slackTs: props.slackTs,
       slackChannelId: props.slackChannelId,
       slackChannelType: props.slackChannelType,

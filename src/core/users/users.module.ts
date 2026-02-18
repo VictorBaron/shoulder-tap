@@ -1,4 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 import { AuthModule } from 'auth/auth.module';
 
 // Application layer - Commands
@@ -18,7 +19,11 @@ import { UserPersistenceModule } from './infrastructure/persistence/user-persist
 import { UsersController } from './users.controller';
 
 @Module({
-  imports: [forwardRef(() => AuthModule), UserPersistenceModule.use('orm')],
+  imports: [
+    CqrsModule,
+    forwardRef(() => AuthModule),
+    UserPersistenceModule.use('orm'),
+  ],
   controllers: [UsersController],
   providers: [
     // Commands
@@ -32,10 +37,6 @@ import { UsersController } from './users.controller';
     GetAllUsersHandler,
   ],
   exports: [
-    // Commands
-    CreateUserHandler,
-    CreateOAuthUserHandler,
-    LinkGoogleAccountHandler,
     // Queries
     GetUserByIdHandler,
     GetUserByEmailHandler,

@@ -1,19 +1,21 @@
-import { Entity, Index, Property, Unique } from '@mikro-orm/core';
+import { Entity, Index, ManyToOne, Property, Unique } from '@mikro-orm/core';
 import { PersistenceEntity } from 'common/persistence-entity';
 import type { OwnPersistenceEntityProperties } from 'common/types/misc';
 
 import type { MemberRoleLevel } from '@/accounts/domain';
+import { UserMikroOrm } from '@/users/infrastructure/persistence/mikro-orm';
+import { AccountMikroOrm } from './account.mikroORM';
 
 @Entity({ tableName: 'member' })
-@Unique({ properties: ['accountId', 'userId'] })
-@Index({ properties: ['accountId'], name: 'idx_member_accountId' })
-@Index({ properties: ['userId'], name: 'idx_member_userId' })
+@Unique({ properties: ['account', 'user'] })
+@Index({ properties: ['account'], name: 'idx_member_accountId' })
+@Index({ properties: ['user'], name: 'idx_member_userId' })
 export class MemberMikroOrm extends PersistenceEntity {
-  @Property({ type: 'uuid' })
-  accountId: string;
+  @ManyToOne(() => AccountMikroOrm)
+  account?: AccountMikroOrm;
 
-  @Property({ type: 'uuid' })
-  userId: string;
+  @ManyToOne(() => UserMikroOrm)
+  user?: UserMikroOrm;
 
   @Property({ type: 'varchar', length: 50 })
   role: MemberRoleLevel;

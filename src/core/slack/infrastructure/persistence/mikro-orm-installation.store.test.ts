@@ -1,7 +1,7 @@
+import { CommandBus } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import type { Installation } from '@slack/bolt';
 
-import { ProvisionAccountFromSlackHandler } from '@/accounts/application/commands/provision-account-from-slack';
 import { SlackInstallationFactory } from '@/slack/__tests__/factories/slack-installation.factory';
 import { SlackInstallationRepository } from '@/slack/domain/slack-installation.repository';
 
@@ -43,7 +43,7 @@ describe('SlackInstallation Store', () => {
           useClass: SlackInstallationRepositoryInMemory,
         },
         {
-          provide: ProvisionAccountFromSlackHandler,
+          provide: CommandBus,
           useValue: { execute: jest.fn() },
         },
       ],

@@ -7,9 +7,7 @@ export class ChannelRepositoryInMemory
   implements ChannelRepository
 {
   async findByAccountId(accountId: string): Promise<Channel[]> {
-    return this.toArray().filter(
-      (channel) => channel.toJSON().accountId === accountId,
-    );
+    return this.filter((channel) => channel.toJSON().accountId === accountId);
   }
 
   async findBySlackChannelId({
@@ -20,7 +18,7 @@ export class ChannelRepositoryInMemory
     slackChannelId: string;
   }): Promise<Channel | null> {
     return (
-      this.toArray().find((channel) => {
+      this.find((channel) => {
         const json = channel.toJSON();
         return (
           json.accountId === accountId && json.slackChannelId === slackChannelId

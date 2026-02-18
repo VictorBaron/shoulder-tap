@@ -1,5 +1,5 @@
 import { Account } from '@/accounts/domain';
-import { AccountMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm';
+import { AccountMikroOrm } from '../models/account.mikroORM';
 
 export class AccountMapper {
   static toDomain(raw: AccountMikroOrm): Account {

@@ -9,7 +9,7 @@ import {
   MemberRoleChangedEvent,
 } from '@/accounts/domain/events';
 import { MemberPreferences, MemberRole } from '@/accounts/domain/value-objects';
-
+import { User } from '@/users/domain';
 import type {
   CreateFounderMemberProps,
   CreateMemberProps,
@@ -19,7 +19,7 @@ import type {
 
 export class Member extends AggregateRoot {
   private accountId: string;
-  private userId: string;
+  private user: User;
   private role: MemberRole;
   private invitedAt: Date | null;
   private activatedAt: Date | null;
@@ -29,14 +29,9 @@ export class Member extends AggregateRoot {
   private preferences: MemberPreferences;
 
   private constructor(props: MemberProps) {
-    super({
-      id: props.id,
-      createdAt: props.createdAt,
-      updatedAt: props.updatedAt,
-      deletedAt: props.deletedAt,
-    });
+    super(props);
     this.accountId = props.accountId;
-    this.userId = props.userId;
+    this.user = props.user;
     this.role = props.role;
     this.invitedAt = props.invitedAt;
     this.activatedAt = props.activatedAt;
@@ -46,7 +41,7 @@ export class Member extends AggregateRoot {
     this.preferences = props.preferences;
   }
 
-  static invite({ inviter, userId }: CreateMemberProps): Member {
+  static invite({ inviter, user }: CreateMemberProps): Member {
     const now = new Date();
 
     if (!inviter.canInvite()) {
@@ -56,7 +51,7 @@ export class Member extends AggregateRoot {
     const member = new Member({
       id: crypto.randomUUID(),
       accountId: inviter.accountId,
-      userId,
+      user,
       role: MemberRole.user,
       invitedAt: now,
       activatedAt: null,
@@ -86,7 +81,7 @@ export class Member extends AggregateRoot {
     const member = new Member({
       id: crypto.randomUUID(),
       accountId: props.accountId,
-      userId: props.userId,
+      user: props.user,
       role: MemberRole.admin,
       invitedAt: null,
       activatedAt: now,
@@ -100,26 +95,6 @@ export class Member extends AggregateRoot {
     });
 
     return member;
-  }
-
-  static createActive(props: CreateFounderMemberProps): Member {
-    const now = new Date();
-
-    return new Member({
-      id: crypto.randomUUID(),
-      accountId: props.accountId,
-      userId: props.userId,
-      role: MemberRole.user,
-      invitedAt: null,
-      activatedAt: now,
-      disabledAt: null,
-      invitedById: null,
-      lastActiveAt: now,
-      preferences: MemberPreferences.empty(),
-      createdAt: now,
-      updatedAt: now,
-      deletedAt: null,
-    });
   }
 
   static reconstitute(props: MemberProps): Member {
@@ -277,14 +252,26 @@ export class Member extends AggregateRoot {
     return this.accountId;
   }
   getUserId(): string {
-    return this.userId;
+    return this.user.getId();
+  }
+
+  identify({
+    accountId,
+    slackUserId,
+  }: {
+    accountId: string;
+    slackUserId: string;
+  }) {
+    return (
+      this.accountId === accountId && this.user.getSlackId() === slackUserId
+    );
   }
 
   toJSON(): MemberJSON {
     return {
       id: this.id,
       accountId: this.accountId,
-      userId: this.userId,
+      userId: this.user.getId(),
       role: this.role.getValue(),
       invitedAt: this.invitedAt,
       activatedAt: this.activatedAt,
