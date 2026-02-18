@@ -51,6 +51,8 @@ export class FilterIncomingMessageHandler extends BaseCommandHandler<FilterIncom
     });
     await this.messageRepository.save(message);
 
+    this.logger.log('New message', message);
+
     return message;
   }
 
