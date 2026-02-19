@@ -1,6 +1,9 @@
 import { GenericMessageEvent } from '@slack/types';
 import { AggregateRoot } from 'common/domain';
-import { MessageCreatedEvent } from '@/messages/domain/events';
+import {
+  MessageCreatedEvent,
+  MessageScoredEvent,
+} from '@/messages/domain/events';
 import type {
   CreateMessageProps,
   MessageJSON,
@@ -15,6 +18,8 @@ export class Message extends AggregateRoot {
   private slackChannelType: GenericMessageEvent['channel_type'];
   private slackThreadTs: string | null;
   private text: string | null;
+  private urgencyScore: number | null;
+  private urgencyReasoning: string | null;
 
   private constructor(props: MessageProps) {
     super({
@@ -30,6 +35,8 @@ export class Message extends AggregateRoot {
     this.slackChannelType = props.slackChannelType;
     this.slackThreadTs = props.slackThreadTs;
     this.text = props.text;
+    this.urgencyScore = props.urgencyScore;
+    this.urgencyReasoning = props.urgencyReasoning;
   }
 
   static create(props: CreateMessageProps): Message {
@@ -44,6 +51,8 @@ export class Message extends AggregateRoot {
       slackChannelType: props.slackChannelType,
       slackThreadTs: props.slackThreadTs,
       text: props.text,
+      urgencyScore: null,
+      urgencyReasoning: null,
       createdAt: now,
       updatedAt: now,
       deletedAt: null,
@@ -58,6 +67,24 @@ export class Message extends AggregateRoot {
     return new Message(props);
   }
 
+  setUrgencyScore({
+    score,
+    reasoning,
+  }: {
+    score: number;
+    reasoning: string;
+  }): void {
+    this.urgencyScore = score;
+    this.urgencyReasoning = reasoning;
+    this.addDomainEvent(
+      new MessageScoredEvent({
+        messageId: this.id,
+        score,
+        reasoning,
+      }),
+    );
+  }
+
   toJSON(): MessageJSON {
     return {
       id: this.id,
@@ -68,6 +95,8 @@ export class Message extends AggregateRoot {
       slackChannelType: this.slackChannelType,
       slackThreadTs: this.slackThreadTs,
       text: this.text,
+      urgencyScore: this.urgencyScore,
+      urgencyReasoning: this.urgencyReasoning,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       deletedAt: this.deletedAt,

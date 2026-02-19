@@ -10,6 +10,8 @@ export interface MessageProps extends AggregateRootProps {
   slackChannelType: GenericMessageEvent['channel_type'];
   slackThreadTs: string | null;
   text: string | null;
+  urgencyScore: number | null;
+  urgencyReasoning: string | null;
 }
 export interface CreateMessageProps {
   sender: Member;
@@ -28,4 +30,6 @@ export interface MessageJSON extends AggregateRootJSON {
   slackChannelType: GenericMessageEvent['channel_type'];
   slackThreadTs: string | null;
   text: string | null;
+  urgencyScore: number | null;
+  urgencyReasoning: string | null;
 }

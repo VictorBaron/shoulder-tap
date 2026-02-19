@@ -5,9 +5,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { AccountsModule } from '@/accounts/accounts.module';
+import { AiModule } from '@/ai/ai.module';
 import { MessagesModule } from '@/messages/messages.module';
 import { UsersModule } from '@/users/users.module';
-
 import { AccountMikroOrm } from './core/accounts/infrastructure/persistence/mikro-orm/models/account.mikroORM';
 import { MemberMikroOrm } from './core/accounts/infrastructure/persistence/mikro-orm/models/member.mikroORM';
 import { ChannelMikroOrm } from './core/channels/infrastructure/persistence/mikro-orm/models/channel.mikroORM';
@@ -40,6 +40,7 @@ import { UserMikroOrm } from './core/users/infrastructure/persistence/mikro-orm/
     UsersModule,
     SlackModule,
     MessagesModule,
+    AiModule,
   ],
 })
 export class AppModule {}

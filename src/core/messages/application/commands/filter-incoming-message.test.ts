@@ -10,8 +10,11 @@ import {
   MessageCreatedEvent,
   type MessageJSON,
   MessageRepository,
+  MessageScoredEvent,
 } from '@/messages/domain';
 import { MessageRepositoryInMemory } from '@/messages/infrastructure/persistence/in-memory/message.repository.in-memory';
+import { URGENCY_SCORING_GATEWAY } from '@/scoring/domain/gateways';
+import { FakeUrgencyScoringGateway } from '@/scoring/infrastructure/gateways';
 import { UserFactory } from '@/users/__tests__/factories/user.factory';
 import {
   FilterIncomingMessageCommand,
@@ -48,6 +51,10 @@ describe('Filter incoming message', () => {
         { provide: MessageRepository, useClass: MessageRepositoryInMemory },
         { provide: AccountRepository, useClass: AccountRepositoryInMemory },
         { provide: MemberRepository, useClass: MemberRepositoryInMemory },
+        {
+          provide: URGENCY_SCORING_GATEWAY,
+          useClass: FakeUrgencyScoringGateway,
+        },
       ],
     }).compile();
 
@@ -138,5 +145,36 @@ describe('Filter incoming message', () => {
     const result = await handler.execute(command);
     const saved = await messageRepository.findById(result!.id);
     expect(saved?.toJSON().slackThreadTs).toBe('1234567890.123456');
+  });
+
+  it('should score the message urgency and persist it', async () => {
+    const command = new FilterIncomingMessageCommand({
+      messageEvent: createGenericMessageEvent({
+        text: 'Production is down!',
+      }),
+    });
+
+    const result = await handler.execute(command);
+    const saved = await messageRepository.findById(result!.id);
+
+    expect(saved?.toJSON()).toMatchObject<Partial<MessageJSON>>({
+      urgencyScore: 3,
+      urgencyReasoning: 'Fake scoring',
+    });
+  });
+
+  it('should emit a MessageScoredEvent', async () => {
+    const command = new FilterIncomingMessageCommand({
+      messageEvent: createGenericMessageEvent({
+        text: 'Production is down!',
+      }),
+    });
+
+    const result = await handler.execute(command);
+    const events = result!.findEvents(MessageScoredEvent);
+
+    expect(events).toHaveLength(1);
+    expect(events[0].score).toBe(3);
+    expect(events[0].reasoning).toBe('Fake scoring');
   });
 });

@@ -4,6 +4,10 @@ import type { GenericMessageEvent } from '@slack/types';
 import { BaseCommandHandler } from 'src/common/application/command-handler';
 import { AccountRepository, MemberRepository } from '@/accounts';
 import { Message, MessageRepository } from '@/messages/domain';
+import {
+  URGENCY_SCORING_GATEWAY,
+  type UrgencyScoringGateway,
+} from '@/scoring/domain/gateways';
 
 export class FilterIncomingMessageCommand {
   constructor(
@@ -22,6 +26,8 @@ export class FilterIncomingMessageHandler extends BaseCommandHandler<FilterIncom
     private accountRepository: AccountRepository,
     @Inject(MemberRepository)
     private memberRepository: MemberRepository,
+    @Inject(URGENCY_SCORING_GATEWAY)
+    private scoringGateway: UrgencyScoringGateway,
   ) {
     super();
   }
@@ -30,6 +36,8 @@ export class FilterIncomingMessageHandler extends BaseCommandHandler<FilterIncom
     command: FilterIncomingMessageCommand,
   ): Promise<Message | null> {
     const { messageEvent } = command.props;
+
+    this.logger.log(messageEvent);
 
     if (!messageEvent.text) {
       this.logger.warn('Received Slack message with no text');
@@ -49,9 +57,13 @@ export class FilterIncomingMessageHandler extends BaseCommandHandler<FilterIncom
       slackThreadTs: messageEvent.thread_ts ?? null,
       slackTs: messageEvent.ts,
     });
-    await this.messageRepository.save(message);
 
-    this.logger.log('New message', message);
+    const { score, reasoning } = await this.scoringGateway.scoreMessage({
+      text: messageEvent.text,
+    });
+    message.setUrgencyScore({ score, reasoning });
+
+    await this.messageRepository.save(message);
 
     return message;
   }

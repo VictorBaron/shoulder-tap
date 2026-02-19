@@ -31,6 +31,12 @@ export class MessageMikroOrm extends PersistenceEntity {
   @Property({ type: 'text', nullable: true })
   text: string | null;
 
+  @Property({ type: 'smallint', nullable: true })
+  urgencyScore: number | null;
+
+  @Property({ type: 'text', nullable: true })
+  urgencyReasoning: string | null;
+
   static build(
     props: OwnPersistenceEntityProperties<MessageMikroOrm>,
   ): MessageMikroOrm {
