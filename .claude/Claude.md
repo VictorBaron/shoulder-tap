@@ -10,8 +10,9 @@ ShoulderTap is a Slack app that intelligently triages workspace messages and del
 
 ## Tech Stack
 
-- **Runtime:** Node.js with NestJS framework
-- **Slack Integration:** Bolt.js (wired into NestJS)
+- **Monorepo:** pnpm workspaces + Turborepo
+- **Backend (`apps/api/`):** Node.js with NestJS framework, Bolt.js (Slack integration)
+- **Desktop (`apps/electron/`):** Electron
 - **Database:** PostgreSQL with MikroORM
 - **LLM:** Claude API (for urgency scoring)
 - **Calendar:** Google Calendar API (OAuth2)
@@ -40,22 +41,27 @@ The project follows a 7-phase build sequence defined in `build-sequence.md`. Alw
 
 ## Key Conventions
 
-### Project Structure (NestJS)
+### Project Structure
 
 ```
-src/
-  core/
-    slack/              # Bolt.js integration, event listeners, commands
-    auth/               # Slack OAuth + Google OAuth flows
-    messages/           # Message ingestion, pre-filtering, storage
-    scoring/            # LLM urgency scoring prompt + logic
-    calendar/           # Google Calendar sync, break detection
-    notifications/      # DM delivery, batching, digest jobs
-    users/              # User entity, preferences, activity tracking
-    accounts/           # Account & Member entities, customer accounts information
-  app.module.ts
-  main.ts
-  common/             # Shared utilities, decorators, guards
+apps/
+  api/                  # NestJS backend
+    src/
+      core/
+        slack/              # Bolt.js integration, event listeners, commands
+        auth/               # Slack OAuth + Google OAuth flows
+        messages/           # Message ingestion, pre-filtering, storage
+        scoring/            # LLM urgency scoring prompt + logic
+        calendar/           # Google Calendar sync, break detection
+        notifications/      # DM delivery, batching, digest jobs
+        users/              # User entity, preferences, activity tracking
+        accounts/           # Account & Member entities, customer accounts information
+      app.module.ts
+      main.ts
+      common/             # Shared utilities, decorators, guards
+  electron/             # Electron desktop app
+    main.js             # Electron main process entry point
+    index.html          # Renderer entry point
 ```
 
 ### Database / MikroORM

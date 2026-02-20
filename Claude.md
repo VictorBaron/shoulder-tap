@@ -19,7 +19,10 @@ It notifies you if it's urgent; or at the end of your focus time-blockers or mee
 
 ## Technical details
 
-ShoulderTap is a pnpm monorepo with a NestJS API backend and React frontend.
+ShoulderTap is a pnpm + Turborepo monorepo with two apps:
+- `apps/api/` — NestJS API backend
+- `apps/electron/` — Electron desktop app
+
 Authentication is via Google OAuth.
 
 ### Architecture (MANDATORY)
@@ -68,7 +71,7 @@ These rules apply to ALL backend code. Follow them strictly.
 # Install dependencies (at root)
 pnpm install
 
-# Start development (all apps in watch mode)
+# Start development (all apps in watch mode via Turbo)
 pnpm dev
 
 # Build all apps
@@ -78,16 +81,29 @@ pnpm build
 pnpm dev              # Start NestJS in watch mode
 pnpm build            # Compile TypeScript
 pnpm start:prod       # Run compiled API
+
+# Electron-specific commands (run from apps/electron/)
+pnpm start            # Launch Electron app
+```
+
+### Monorepo Structure
+
+```
+apps/
+  api/        # NestJS backend (Hexagonal Architecture + DDD)
+  electron/   # Electron desktop app
 ```
 
 ### API Module Organization
 
-The API follows NestJS modular architecture with domain-based modules.
+The API (`apps/api/`) follows NestJS modular architecture with domain-based modules.
 
 ## Tech Stack
 
+- **Monorepo:** pnpm workspaces + Turborepo
 - **Runtime:** Node 20, TypeScript (ES2021, strict mode)
-- **Backend:** NestJS 11, Express 5, Passport.js
+- **Backend (`apps/api/`):** NestJS 11, Express 5, Passport.js
+- **Desktop (`apps/electron/`):** Electron
 - **Database:** PostgreSQL 16, MikroORM
 - **Auth:** @nestjs/passport, passport-google-oauth20, @nestjs/jwt
 
