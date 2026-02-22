@@ -4,7 +4,7 @@
 
 ### Test-First Development (MANDATORY)
 
-When implementing any feature or change:
+When implementing any new use case or change (does not apply for queries):
 
 1. **Write behavioral tests FIRST** — Before writing any production code, write tests that describe the expected behavior using BDD-style descriptions (`should ...`).
 2. **Use the test-writer agent** — Always delegate test writing to `@.claude/agents/test-writer`.

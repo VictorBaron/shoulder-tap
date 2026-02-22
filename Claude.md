@@ -1,5 +1,9 @@
 # ShoulderTap - Project Context
 
+## Project Overview
+
+This is a Turborepo monorepo with a NestJS API (runs in Docker), an Electron desktop app (TypeScript/React), and shared packages. Use `pnpm` as the package manager. Run `pnpm turbo dev` to start development.
+
 ## Workflow Rules
 
 ### Test-First Development (MANDATORY)
@@ -32,6 +36,10 @@ Refer to these skills for guidance:
 - `.claude/skills/ddd/skill.md` — DDD patterns, aggregates, entities, value objects, repositories, mappers
 - `.claude/hexagonal-architecture.md` — Module structure and port/adapter constraints
 
+This project uses hexagonal/clean architecture with domain, persistence, API, and module layers. When implementing a new domain feature, follow the pattern: entity → repository interface → MikroORM mapper/repository → module wiring → handler → tests.
+
+When implementing CQRS command handlers, use the CommandBus pattern already established in the codebase. All handlers extend the base command handler class with built-in logger.
+
 ### Hexagonal Architecture & DDD Rules
 
 These rules apply to ALL backend code. Follow them strictly.
@@ -41,13 +49,13 @@ These rules apply to ALL backend code. Follow them strictly.
 - Business logic lives inside domain entities and aggregates, NOT in services
 - Aggregates are the consistency boundary — always fetch and save an aggregate as a whole
 - Domain entities are plain TypeScript classes with behavior methods, NOT MikroORM entities
-- Domain layer defines port interfaces (e.g., `UserRepository`, `SlackGateway`, `CalendarGateway`) — never imports infrastructure code
+- Domain layer defines port interfaces (e.g., `UserRepository`, `SlackGateway`, `CalendarGateway`) — never import infrastructure code.
 
 **Application Layer (use cases / command & query handlers):**
 
-- Orchestrates domain objects — does NOT contain business logic itself
-- Fetches aggregates via repository ports, calls domain methods, then saves via repository ports
-- Uses dependency injection for all ports (repositories, external API gateways)
+- Orchestrate domain objects — does NOT contain business logic itself
+- Fetch aggregates via repository ports, calls domain methods, then saves via repository ports
+- Use dependency injection for all ports (repositories, external API gateways)
 
 **Infrastructure Layer (outermost — implements ports):**
 
@@ -64,6 +72,10 @@ These rules apply to ALL backend code. Follow them strictly.
 - Domain models and persistence models are separate classes — always use mappers to convert between them
 - Aggregates enforce their own invariants — validation logic belongs on the aggregate, not in the service
 - **Dependency injection is mandatory** for all services/repositories that access external systems (database, Slack API, Google Calendar API, Claude API, etc.) — define port interfaces in domain, inject implementations via NestJS DI
+
+## Database / ORM
+
+For MikroORM entities: avoid composite primary keys, use `rel()` helper for setting foreign key references without loading full entities, and be careful with circular barrel-file imports which cause undefined mapper errors at runtime.
 
 ## Commands
 
@@ -113,3 +125,9 @@ The API (`apps/api/`) follows NestJS modular architecture with domain-based modu
   - Use relative imports if files are colocated, absolute imports if the file is in a parent repository
   - For absolute imports, core modules (modules inside src/core/) should be accessed through alias path @/.
     Example: @/users/domain
+
+
+ ## Linting & Formatting
+ 
+Use Biome for formatting and linting (not Prettier). 
+

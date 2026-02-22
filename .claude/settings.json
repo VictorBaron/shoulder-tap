@@ -1,5 +1,7 @@
 {
   "hooks": {
+    "postEditCommand": "pnpm biome check --write {file}",
+    "postWrite": "pnpm biome check --write {file}",
     "PostToolUse": [
       {
         "matcher": "Write|Edit|MultiEdit",

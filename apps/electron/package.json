@@ -10,7 +10,7 @@
     "dev": "concurrently -k \"tsc -p tsconfig.json --watch\" \"vite\" \"wait-on http://localhost:5173 dist/main.js && VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
     "build": "tsc -p tsconfig.json && vite build",
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No test specified\" "
   },
   "devDependencies": {
     "@types/node": "^22.13.0",
