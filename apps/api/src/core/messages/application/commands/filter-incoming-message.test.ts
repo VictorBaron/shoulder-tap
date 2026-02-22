@@ -11,6 +11,7 @@ import { ChannelRepositoryInMemory } from '@/channels/infrastructure/persistence
 import { ConversationFactory } from '@/conversations/__tests__/factories/conversation.factory';
 import { ConversationRepository } from '@/conversations/domain';
 import { ConversationRepositoryInMemory } from '@/conversations/infrastructure/persistence/in-memory/conversation.repository.in-memory';
+import { MessageScoringService } from '@/messages/application/services/message-scoring.service';
 import {
   Message,
   MessageCreatedEvent,
@@ -24,7 +25,6 @@ import { MessageRepositoryInMemory } from '@/messages/infrastructure/persistence
 import { URGENCY_SCORING_GATEWAY } from '@/scoring/domain/gateways';
 import { FakeUrgencyScoringGateway } from '@/scoring/infrastructure/gateways';
 import { UserFactory } from '@/users/__tests__/factories/user.factory';
-import { Email } from '@/users/domain';
 import { FilterIncomingMessage, FilterIncomingMessageCommand } from './filter-incoming-message';
 
 const createGenericMessageEvent = (props: Partial<GenericMessageEvent>): GenericMessageEvent => {
@@ -55,6 +55,7 @@ describe('Filter incoming message', () => {
     const module = await Test.createTestingModule({
       providers: [
         FilterIncomingMessage,
+        MessageScoringService,
         { provide: MessageRepository, useClass: MessageRepositoryInMemory },
         { provide: AccountRepository, useClass: AccountRepositoryInMemory },
         { provide: MemberRepository, useClass: MemberRepositoryInMemory },
@@ -166,6 +167,15 @@ describe('Filter incoming message', () => {
     const result = await handler.execute(command);
     const saved = await messageRepository.findById(result!.id);
     expect(saved?.toJSON().slackThreadTs).toBe('1234567890.123456');
+  });
+
+  it('should return null when the message has no text', async () => {
+    const command = new FilterIncomingMessageCommand({
+      messageEvent: createGenericMessageEvent({ text: undefined }),
+    });
+
+    const result = await handler.execute(command);
+    expect(result).toBeNull();
   });
 
   it('should score the message urgency and persist it', async () => {
@@ -281,256 +291,6 @@ describe('Filter incoming message', () => {
       const lastInput = scoringGateway.getLastInput();
       expect(lastInput.recipients).toHaveLength(1);
       expect(lastInput.recipients[0].getId()).toBe('recipient1Id');
-    });
-  });
-
-  describe('urgent notification', () => {
-    let notificationGateway: FakeUrgentNotificationGateway;
-    let urgencyScoringGateway: FakeUrgencyScoringGateway;
-
-    beforeEach(async () => {
-      notificationGateway = new FakeUrgentNotificationGateway();
-
-      const module = await Test.createTestingModule({
-        providers: [
-          FilterIncomingMessage,
-          { provide: MessageRepository, useClass: MessageRepositoryInMemory },
-          { provide: AccountRepository, useClass: AccountRepositoryInMemory },
-          { provide: MemberRepository, useClass: MemberRepositoryInMemory },
-          { provide: ChannelRepository, useClass: ChannelRepositoryInMemory },
-          { provide: ConversationRepository, useClass: ConversationRepositoryInMemory },
-          { provide: URGENCY_SCORING_GATEWAY, useClass: FakeUrgencyScoringGateway },
-          { provide: URGENT_NOTIFICATION_GATEWAY, useValue: notificationGateway },
-        ],
-      }).compile();
-
-      const localHandler = module.get(FilterIncomingMessage);
-      const localMessageRepo = module.get<MessageRepositoryInMemory>(MessageRepository);
-      const localAccountRepo = module.get<AccountRepositoryInMemory>(AccountRepository);
-      const localMemberRepo = module.get<MemberRepositoryInMemory>(MemberRepository);
-      urgencyScoringGateway = module.get<FakeUrgencyScoringGateway>(URGENCY_SCORING_GATEWAY);
-
-      localMessageRepo.clear();
-      localAccountRepo.clear();
-      localMemberRepo.clear();
-
-      await localAccountRepo.save(AccountFactory.create({ id: 'accountId', slackTeamId: 'teamId' }));
-      await localMemberRepo.save(
-        MemberFactory.create({
-          id: 'senderId',
-          accountId: 'accountId',
-          user: UserFactory.create({ id: 'senderUserId', slackId: 'slackUserId' }),
-        }),
-      );
-
-      handler = localHandler;
-      messageRepository = localMessageRepo;
-    });
-
-    it('should call the urgent notification gateway when message scores 5', async () => {
-      urgencyScoringGateway.setScore(5, 'Prod is down');
-
-      const command = new FilterIncomingMessageCommand({
-        messageEvent: createGenericMessageEvent({ text: 'Production is down!' }),
-      });
-
-      const result = await handler.execute(command);
-
-      expect(notificationGateway.getCallCount()).toBe(1);
-
-      const saved = await messageRepository.findById(result!.id);
-      expect(saved?.toJSON()).toMatchObject<Partial<MessageJSON>>({
-        urgencyScore: 5,
-        urgencyReasoning: 'Prod is down',
-      });
-    });
-
-    it('should include the message text, id, score, and reasoning in the notification payload', async () => {
-      urgencyScoringGateway.setScore(5, 'Prod is down');
-
-      const command = new FilterIncomingMessageCommand({
-        messageEvent: createGenericMessageEvent({ text: 'Production is down!' }),
-      });
-
-      const result = await handler.execute(command);
-      const payload = notificationGateway.getLastPayload();
-
-      expect(payload).toMatchObject({
-        messageId: result!.id,
-        text: 'Production is down!',
-        score: 5,
-        reasoning: 'Prod is down',
-      });
-    });
-
-    it('should NOT call the urgent notification gateway when message scores less than 5', async () => {
-      urgencyScoringGateway.setScore(4, 'Important but not critical');
-
-      const command = new FilterIncomingMessageCommand({
-        messageEvent: createGenericMessageEvent({ text: 'Hey, can you check this?' }),
-      });
-
-      await handler.execute(command);
-
-      expect(notificationGateway.getCallCount()).toBe(0);
-    });
-
-    describe('enriched notification payload', () => {
-      let localHandler: FilterIncomingMessage;
-      let localNotificationGateway: FakeUrgentNotificationGateway;
-      let localChannelRepo: ChannelRepositoryInMemory;
-      let localConversationRepo: ConversationRepositoryInMemory;
-      let localScoringGateway: FakeUrgencyScoringGateway;
-
-      beforeEach(async () => {
-        localNotificationGateway = new FakeUrgentNotificationGateway();
-
-        const module = await Test.createTestingModule({
-          providers: [
-            FilterIncomingMessage,
-            { provide: MessageRepository, useClass: MessageRepositoryInMemory },
-            { provide: AccountRepository, useClass: AccountRepositoryInMemory },
-            { provide: MemberRepository, useClass: MemberRepositoryInMemory },
-            { provide: ChannelRepository, useClass: ChannelRepositoryInMemory },
-            { provide: ConversationRepository, useClass: ConversationRepositoryInMemory },
-            { provide: URGENCY_SCORING_GATEWAY, useClass: FakeUrgencyScoringGateway },
-            { provide: URGENT_NOTIFICATION_GATEWAY, useValue: localNotificationGateway },
-          ],
-        }).compile();
-
-        localHandler = module.get(FilterIncomingMessage);
-        localScoringGateway = module.get<FakeUrgencyScoringGateway>(URGENCY_SCORING_GATEWAY);
-        localChannelRepo = module.get<ChannelRepositoryInMemory>(ChannelRepository);
-        localConversationRepo = module.get<ConversationRepositoryInMemory>(ConversationRepository);
-
-        const localAccountRepo = module.get<AccountRepositoryInMemory>(AccountRepository);
-        const localMemberRepo = module.get<MemberRepositoryInMemory>(MemberRepository);
-
-        await localAccountRepo.save(AccountFactory.create({ id: 'accountId', slackTeamId: 'T_SLACK' }));
-        await localMemberRepo.save(
-          MemberFactory.create({
-            id: 'senderId',
-            accountId: 'accountId',
-            user: UserFactory.create({
-              id: 'senderUserId',
-              slackId: 'slackUserId',
-              name: 'Alice Martin',
-              email: Email.create('alice@example.com'),
-            }),
-          }),
-        );
-
-        localScoringGateway.setScore(5, 'Critical issue');
-      });
-
-      describe('when message is in a channel', () => {
-        beforeEach(async () => {
-          await localChannelRepo.save(
-            ChannelFactory.create({
-              accountId: 'accountId',
-              slackChannelId: 'C_GENERAL',
-              name: 'general',
-              memberIds: ['senderId'],
-            }),
-          );
-        });
-
-        it('should include sender name and email in the notification payload', async () => {
-          await localHandler.execute(
-            new FilterIncomingMessageCommand({
-              messageEvent: createGenericMessageEvent({
-                team: 'T_SLACK',
-                user: 'slackUserId',
-                channel: 'C_GENERAL',
-                channel_type: 'channel',
-              }),
-            }),
-          );
-
-          expect(localNotificationGateway.getLastPayload().sender).toEqual({
-            name: 'Alice Martin',
-            email: 'alice@example.com',
-          });
-        });
-
-        it('should include channel name and type in the notification payload', async () => {
-          await localHandler.execute(
-            new FilterIncomingMessageCommand({
-              messageEvent: createGenericMessageEvent({
-                team: 'T_SLACK',
-                user: 'slackUserId',
-                channel: 'C_GENERAL',
-                channel_type: 'channel',
-              }),
-            }),
-          );
-
-          expect(localNotificationGateway.getLastPayload().channel).toEqual({
-            name: 'general',
-            type: 'channel',
-          });
-        });
-
-        it('should include a slack deep link in the notification payload', async () => {
-          await localHandler.execute(
-            new FilterIncomingMessageCommand({
-              messageEvent: createGenericMessageEvent({
-                team: 'T_SLACK',
-                user: 'slackUserId',
-                channel: 'C_GENERAL',
-                channel_type: 'channel',
-              }),
-            }),
-          );
-
-          expect(localNotificationGateway.getLastPayload().slackLink).toBe('slack://channel?team=T_SLACK&id=C_GENERAL');
-        });
-      });
-
-      describe('when message is a direct message (im)', () => {
-        beforeEach(async () => {
-          await localConversationRepo.save(
-            ConversationFactory.create({
-              accountId: 'accountId',
-              slackConversationId: 'D_DM',
-              memberIds: ['senderId'],
-            }),
-          );
-        });
-
-        it('should set channel.name to null in the notification payload', async () => {
-          await localHandler.execute(
-            new FilterIncomingMessageCommand({
-              messageEvent: createGenericMessageEvent({
-                team: 'T_SLACK',
-                user: 'slackUserId',
-                channel: 'D_DM',
-                channel_type: 'im',
-              }),
-            }),
-          );
-
-          expect(localNotificationGateway.getLastPayload().channel).toEqual({
-            name: null,
-            type: 'im',
-          });
-        });
-
-        it('should include a slack deep link in the notification payload', async () => {
-          await localHandler.execute(
-            new FilterIncomingMessageCommand({
-              messageEvent: createGenericMessageEvent({
-                team: 'T_SLACK',
-                user: 'slackUserId',
-                channel: 'D_DM',
-                channel_type: 'im',
-              }),
-            }),
-          );
-
-          expect(localNotificationGateway.getLastPayload().slackLink).toBe('slack://channel?team=T_SLACK&id=D_DM');
-        });
-      });
     });
   });
 });

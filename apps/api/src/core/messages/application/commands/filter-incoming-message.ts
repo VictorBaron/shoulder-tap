@@ -1,17 +1,11 @@
-import { Inject } from '@nestjs/common';
 import { CommandHandler } from '@nestjs/cqrs';
 import type { GenericMessageEvent } from '@slack/types';
 import { BaseCommand } from 'common/application/command-handler';
 import { AccountRepository, Member, MemberRepository } from '@/accounts';
 import { ChannelRepository } from '@/channels/domain';
 import { ConversationRepository } from '@/conversations/domain';
-import {
-  Message,
-  MessageRepository,
-  URGENT_NOTIFICATION_GATEWAY,
-  type UrgentNotificationGateway,
-} from '@/messages/domain';
-import { URGENCY_SCORING_GATEWAY, type UrgencyScoringGateway } from '@/scoring/domain/gateways';
+import { MessageScoringService } from '@/messages/application/services/message-scoring.service';
+import { Message, MessageRepository } from '@/messages/domain';
 
 export class FilterIncomingMessageCommand {
   constructor(
@@ -25,14 +19,11 @@ export class FilterIncomingMessageCommand {
 export class FilterIncomingMessage extends BaseCommand<FilterIncomingMessageCommand> {
   constructor(
     private readonly messageRepository: MessageRepository,
-    private accountRepository: AccountRepository,
-    private memberRepository: MemberRepository,
-    private channelRepository: ChannelRepository,
-    private conversationRepository: ConversationRepository,
-    @Inject(URGENCY_SCORING_GATEWAY)
-    private scoringGateway: UrgencyScoringGateway,
-    @Inject(URGENT_NOTIFICATION_GATEWAY)
-    private notificationGateway: UrgentNotificationGateway,
+    private readonly accountRepository: AccountRepository,
+    private readonly memberRepository: MemberRepository,
+    private readonly channelRepository: ChannelRepository,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly messageScoringService: MessageScoringService,
   ) {
     super();
   }
@@ -68,32 +59,17 @@ export class FilterIncomingMessage extends BaseCommand<FilterIncomingMessageComm
       slackTs: messageEvent.ts,
     });
 
-    const { score, reasoning } = await this.scoringGateway.scoreMessage({
-      text: messageEvent.text,
-      recipients,
-    });
-    message.setUrgencyScore({ score, reasoning });
-
     await this.messageRepository.save(message);
 
-    if (message.isUrgent()) {
-      this.logger.log('🚨 URGENT MESSAGE 🚨');
-      await this.notificationGateway.notifyUrgentMessage({
-        messageId: message.id,
-        text: messageEvent.text,
-        score,
-        reasoning,
-        sender: {
-          name: sender.getName(),
-          email: sender.getEmail(),
-        },
-        channel: {
-          name: channelName,
-          type: messageEvent.channel_type,
-        },
-        slackLink: `slack://channel?team=${account.getSlackTeamId()}&id=${messageEvent.channel}`,
-      });
-    }
+    await this.messageScoringService.score({
+      message,
+      text: messageEvent.text,
+      recipients,
+      sender,
+      account,
+      channelName,
+      channelType: messageEvent.channel_type,
+    });
 
     return message;
   }

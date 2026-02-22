@@ -30,7 +30,15 @@ function createWindow(): void {
 }
 
 function registerIpcHandlers(): void {
-  ipcMain.handle('interrupts:list', () => []);
+  ipcMain.handle('interrupts:list', async () => {
+    try {
+      const res = await fetch(`${API_URL}/notifications/urgent`);
+      if (!res.ok) return [];
+      return await res.json();
+    } catch {
+      return [];
+    }
+  });
 
   ipcMain.handle('interrupts:markRead', (_event, { id }: { id: string }) => ({
     success: true,

@@ -7,6 +7,8 @@ import { URGENT_NOTIFICATION_GATEWAY } from '@/messages/domain';
 import { ScoringModule } from '@/scoring/scoring.module';
 import { FilterIncomingMessage } from './application/commands/filter-incoming-message';
 import { FilterIncomingReaction } from './application/commands/filter-incoming-reaction';
+import { GetTodaysUrgentMessages } from './application/queries/get-todays-urgent-messages';
+import { MessageScoringService } from './application/services/message-scoring.service';
 import { NotificationsController } from './infrastructure/controllers/notifications.controller';
 import { SseUrgentNotificationGateway } from './infrastructure/gateways/sse-urgent-notification.gateway';
 import { MessagePersistenceModule } from './infrastructure/persistence/message-persistence.module';
@@ -24,6 +26,8 @@ import { MessagePersistenceModule } from './infrastructure/persistence/message-p
   providers: [
     FilterIncomingMessage,
     FilterIncomingReaction,
+    GetTodaysUrgentMessages,
+    MessageScoringService,
     SseUrgentNotificationGateway,
     { provide: URGENT_NOTIFICATION_GATEWAY, useExisting: SseUrgentNotificationGateway },
   ],

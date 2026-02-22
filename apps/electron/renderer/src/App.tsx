@@ -10,6 +10,40 @@ function uid(): string {
   return String(nextId++);
 }
 
+interface UrgentMessageDTO {
+  id: string;
+  text: string;
+  score: number;
+  reasoning: string | null;
+  sender: { name: string | null; email: string };
+  channel: { name: string | null; type: string };
+  slackLink: string;
+  createdAt: string;
+}
+
+function formatTimeAgo(date: Date): string {
+  const diffMins = Math.floor((Date.now() - date.getTime()) / 60000);
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHrs = Math.floor(diffMins / 60);
+  if (diffHrs < 24) return `${diffHrs}h ago`;
+  return `${Math.floor(diffHrs / 24)}d ago`;
+}
+
+function dtoToMessage(dto: UrgentMessageDTO): Message {
+  return {
+    id: dto.id,
+    title: dto.sender.name ?? dto.sender.email,
+    description: dto.text.length > 70 ? dto.text.slice(0, 70) + '…' : dto.text,
+    body: dto.text,
+    source: 'Slack',
+    timeAgo: formatTimeAgo(new Date(dto.createdAt)),
+    score: dto.score,
+    channelLabel: dto.channel.name ? `#${dto.channel.name}` : null,
+    slackLink: dto.slackLink,
+  };
+}
+
 const MOCK_MESSAGES: Message[] = [
   {
     id: '1',
@@ -102,6 +136,16 @@ export default function App() {
       }
     }, 60000);
   }
+
+  // Load today's urgent messages on mount
+  useEffect(() => {
+    window.shouldertap?.listInterrupts().then((dtos: UrgentMessageDTO[]) => {
+      if (dtos.length === 0) return;
+      const loaded = dtos.map(dtoToMessage);
+      setMessages(loaded);
+      setSelectedId(loaded[0].id);
+    });
+  }, []);
 
   // IPC subscription
   useEffect(() => {
