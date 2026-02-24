@@ -17,8 +17,6 @@ export class MessageMapper {
       slackChannelType: raw.slackChannelType,
       slackThreadTs: raw.slackThreadTs,
       text: raw.text,
-      urgencyScore: raw.urgencyScore,
-      urgencyReasoning: raw.urgencyReasoning,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
       deletedAt: raw.deletedAt,
@@ -39,8 +37,6 @@ export class MessageMapper {
       slackChannelType: json.slackChannelType,
       slackThreadTs: json.slackThreadTs,
       text: json.text,
-      urgencyScore: json.urgencyScore,
-      urgencyReasoning: json.urgencyReasoning,
     });
   }
 }

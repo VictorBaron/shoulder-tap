@@ -11,8 +11,6 @@ export class MessageFactory {
       slackChannelType: 'channel',
       slackThreadTs: null,
       text: 'Hello world',
-      urgencyScore: null,
-      urgencyReasoning: null,
       createdAt: new Date('2025-01-01'),
       updatedAt: new Date('2025-01-01'),
       deletedAt: null,

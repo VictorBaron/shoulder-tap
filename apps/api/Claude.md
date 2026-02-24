@@ -1,4 +1,4 @@
-# ShoulderTap - Project Context
+# Drift - Project Context
 
 ## Workflow Rules
 
@@ -13,13 +13,13 @@ When implementing any new use case or change (does not apply for queries):
 
 ## Purpose
 
-This project is named ShoulderTap.
+This project is named Drift.
 It's a SaaS to have better Slack notifications that fits your schedule.
 It notifies you if it's urgent; or at the end of your focus time-blockers or meetings.
 
 ## Technical details
 
-ShoulderTap is a pnpm monorepo with a NestJS API backend and React frontend.
+Drift is a pnpm monorepo with a NestJS API backend and React frontend.
 Authentication is via Google OAuth.
 
 ### Architecture (MANDATORY)

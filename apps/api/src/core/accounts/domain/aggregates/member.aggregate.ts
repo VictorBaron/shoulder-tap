@@ -1,7 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import { AggregateRoot } from 'common/domain';
 import {
-  FocusTimeStartedEvent,
   MemberActivatedEvent,
   MemberDisabledEvent,
   MemberEnabledEvent,
@@ -180,13 +179,6 @@ export class Member extends AggregateRoot {
         actor: activatedBy,
       }),
     );
-  }
-
-  startFocusTime(minutes: number): void {
-    const endsAt = new Date(Date.now() + minutes * 60 * 1000);
-    this.focusEndsAt = endsAt;
-    this.updatedAt = new Date();
-    this.addDomainEvent(new FocusTimeStartedEvent({ member: this, endsAt }));
   }
 
   stopFocusTime(): void {

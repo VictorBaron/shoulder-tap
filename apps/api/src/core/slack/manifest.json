@@ -1,12 +1,12 @@
 {
   "display_information": {
-    "name": "ShoulderTap",
-    "description": "Intelligent notification filtering",
+    "name": "Drift",
+    "description": "Project channels information recap",
     "background_color": "#1a1a1a"
   },
   "features": {
     "bot_user": {
-      "display_name": "ShoulderTap",
+      "display_name": "Drift",
       "always_online": true
     }
   },

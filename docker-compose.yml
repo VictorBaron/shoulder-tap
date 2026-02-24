@@ -4,14 +4,14 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
       target: dev
-    container_name: shoulder-tap-app
+    container_name: drift-app
     restart: unless-stopped
     ports:
       - '3000:3000'
     env_file:
       - apps/api/.env
     environment:
-      DATABASE_URL: postgresql://shouldertap:shouldertap@postgres:5432/shouldertap
+      DATABASE_URL: postgresql://drift:drift@postgres:5432/drift
     volumes:
       - ./apps/api/src:/app/apps/api/src
       - ./apps/api/nest-cli.json:/app/apps/api/nest-cli.json
@@ -23,18 +23,18 @@ services:
 
   postgres:
     image: postgres:16-alpine
-    container_name: shoulder-tap-db
+    container_name: drift-db
     restart: unless-stopped
     ports:
-      - '5432:5432'
+      - '5433:5432'
     environment:
-      POSTGRES_USER: shouldertap
-      POSTGRES_PASSWORD: shouldertap
-      POSTGRES_DB: shouldertap
+      POSTGRES_USER: drift
+      POSTGRES_PASSWORD: drift
+      POSTGRES_DB: drift
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'shouldertap']
+      test: ['CMD', 'pg_isready', '-U', 'drift']
       interval: 5s
       timeout: 5s
       retries: 5

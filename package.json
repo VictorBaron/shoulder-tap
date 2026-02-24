@@ -1,5 +1,5 @@
 {
-  "name": "shoulder-tap",
+  "name": "drift",
   "private": true,
   "scripts": {
     "dev": "turbo dev",
@@ -12,6 +12,6 @@
   },
   "packageManager": "pnpm@10.30.0",
   "pnpm": {
-    "onlyBuiltDependencies": ["electron", "@nestjs/core", "@swc/core", "argon2"]
+    "onlyBuiltDependencies": ["@nestjs/core", "@swc/core", "argon2"]
   }
 }

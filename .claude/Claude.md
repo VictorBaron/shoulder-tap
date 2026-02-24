@@ -1,43 +1,22 @@
-# Claude.md — ShoulderTap
+# Claude.md — Drift
 
 ## Project Overview
 
-ShoulderTap is a Slack app that intelligently triages workspace messages and delivers them at the right time based on urgency and the user's calendar context. Instead of constant Slack notifications, users get:
+Drift is an app that aggregates data from different sources — Linear, Notion, Slack; and generates reports about feature delivery. 
 
-- **Immediate DMs** for truly critical messages (urgency 5)
-- **Batched notifications** during natural calendar breaks for important messages (urgency 3–4)
-- **Daily digests** for low-priority FYI messages (urgency 1–2)
+- **Ongoing projects** and their completion
+- **Decisions made** an important discussions on the project
+- **Drift from initial scope** to catch early on mis-alignment
+- **Other subjects** that takes time & can defocus
 
 ## Tech Stack
 
 - **Monorepo:** pnpm workspaces + Turborepo
 - **Backend (`apps/api/`):** Node.js with NestJS framework, Bolt.js (Slack integration)
-- **Desktop (`apps/electron/`):** Electron
+- **Web app (`apps/app/`):** React
 - **Database:** PostgreSQL with MikroORM
-- **LLM:** Claude API (for urgency scoring)
-- **Calendar:** Google Calendar API (OAuth2)
+- **LLM:** Claude API 
 - **Deployment:** Railway or Render
-
-## Architecture
-
-```
-Slack Events API → Bolt.js listener → Pre-filter pipeline → LLM scoring → Notification router
-                                                                              ├─ Immediate DM (urgency 5)
-                                                                              ├─ Break queue (urgency 3–4, flushed on calendar gaps)
-                                                                              └─ Daily digest (urgency 1–2)
-```
-
-## Build Phases
-
-The project follows a 7-phase build sequence defined in `build-sequence.md`. Always check that file for the current phase and milestones. In summary:
-
-1. **Skeleton & Slack OAuth** — NestJS + Bolt.js, Slack app manifest, OAuth, event logging
-2. **Database & Pre-filtering** — Postgres/MikroORM, activity tracking, heuristic filters
-3. **LLM Scoring** — Claude-powered urgency scoring (1–5 scale), immediate DM for critical
-4. **Google Calendar Integration** — Calendar OAuth, break detection, queued delivery
-5. **Batching & Digest** — Batch logic for 3–4, daily digest for 1–2, DM formatting
-6. **User Preferences & Feedback** — Slash commands / App Home, VIP senders, feedback loop
-7. **Onboarding & Polish** — Guided setup, error handling, monitoring
 
 ## Key Conventions
 
@@ -47,19 +26,17 @@ The project follows a 7-phase build sequence defined in `build-sequence.md`. Alw
 apps/
   api/                  # NestJS backend
     src/
+      auth/               # Slack OAuth + Google OAuth flows
       core/
-        slack/              # Bolt.js integration, event listeners, commands
-        auth/               # Slack OAuth + Google OAuth flows
-        messages/           # Message ingestion, pre-filtering, storage
-        scoring/            # LLM urgency scoring prompt + logic
-        calendar/           # Google Calendar sync, break detection
-        notifications/      # DM delivery, batching, digest jobs
-        users/              # User entity, preferences, activity tracking
         accounts/           # Account & Member entities, customer accounts information
+        ai/                 # AI integration
+        projects/           # Project information + status report
+        integrations/       # Slack, Notion, Linear integrations
+        users/              # User entity, preferences, activity tracking
       app.module.ts
       main.ts
       common/             # Shared utilities, decorators, guards
-  electron/             # Electron desktop app
+  app/                  # React Web app
     main.js             # Electron main process entry point
     index.html          # Renderer entry point
 ```
@@ -245,7 +222,7 @@ describe('Send message', () => {
 
 ## Important Notes
 
-- **User tokens vs Bot tokens:** ShoulderTap needs user token OAuth (not just bot) to read message content the user would see. Bot token is used for sending DMs.
+- **User tokens vs Bot tokens:** Drift needs user token OAuth (not just bot) to read message content the user would see. Bot token is used for sending DMs.
 - **Privacy:** Messages are processed for scoring but should not be stored longer than necessary. Respect workspace data policies.
 - **Rate limits:** Both Slack and Claude APIs have rate limits. Always queue and throttle outbound requests.
 - **Calendar sensitivity:** Never expose calendar event details in Slack DMs — only use calendar data internally for timing decisions.

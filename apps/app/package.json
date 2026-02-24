@@ -1,0 +1,25 @@
+{
+  "name": "drift-app",
+  "version": "1.0.0",
+  "description": "Drift application",
+  "license": "MIT",
+  "author": "Victor Baron",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "echo \"No test specified\" "
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4",
+    "typescript": "~5.7.3",
+    "vite": "^6"
+  },
+  "dependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  }
+}

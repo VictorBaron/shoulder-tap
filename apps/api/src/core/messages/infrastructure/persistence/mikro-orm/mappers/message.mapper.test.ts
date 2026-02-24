@@ -1,4 +1,3 @@
-import { rel } from '@mikro-orm/core';
 import { AccountMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/account.mikroORM';
 import { MemberMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/member.mikroORM';
 import { Message, type MessageJSON } from '@/messages/domain';
@@ -33,23 +32,7 @@ describe('MessageMapper', () => {
       const message = MessageMapper.toDomain(raw);
 
       expect(message.toJSON()).toMatchObject<Partial<MessageJSON>>({
-        urgencyScore: 4,
-        urgencyReasoning: 'Urgent request from manager',
-      });
-    });
-
-    it('should map null urgency fields from persistence to domain', () => {
-      const raw = Object.assign(new MessageMikroOrm(), {
         ...baseMikroOrmProps,
-        urgencyScore: null,
-        urgencyReasoning: null,
-      });
-
-      const message = MessageMapper.toDomain(raw);
-
-      expect(message.toJSON()).toMatchObject<Partial<MessageJSON>>({
-        urgencyScore: null,
-        urgencyReasoning: null,
       });
     });
   });
@@ -65,8 +48,6 @@ describe('MessageMapper', () => {
         slackChannelType: 'channel',
         slackThreadTs: null,
         text: 'Hello world',
-        urgencyScore: 5,
-        urgencyReasoning: 'Production outage',
         createdAt: now,
         updatedAt: now,
         deletedAt: null,
@@ -74,31 +55,9 @@ describe('MessageMapper', () => {
 
       const persistence = MessageMapper.toPersistence(message);
 
-      expect(persistence.urgencyScore).toBe(5);
-      expect(persistence.urgencyReasoning).toBe('Production outage');
-    });
-
-    it('should map null urgency fields from domain to persistence', () => {
-      const message = Message.reconstitute({
-        id: 'msg-1',
-        accountId: 'account-1',
-        senderId: 'member-1',
-        slackTs: '1234567890.123456',
-        slackChannelId: 'C_GENERAL',
-        slackChannelType: 'channel',
-        slackThreadTs: null,
-        text: 'Hello world',
-        urgencyScore: null,
-        urgencyReasoning: null,
-        createdAt: now,
-        updatedAt: now,
-        deletedAt: null,
+      expect(message.toJSON()).toMatchObject<Partial<MessageJSON>>({
+        ...persistence,
       });
-
-      const persistence = MessageMapper.toPersistence(message);
-
-      expect(persistence.urgencyScore).toBeNull();
-      expect(persistence.urgencyReasoning).toBeNull();
     });
   });
 });

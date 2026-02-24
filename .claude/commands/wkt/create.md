@@ -15,7 +15,7 @@ Feature name: "$ARGUMENTS"
 
 2. **Derive names**
    - Branch name: convert "$ARGUMENTS" to lowercase kebab-case (spaces → hyphens, strip special chars)
-   - Worktree path: `../shoulder-tap-<branch-name>` (sibling directory next to the repo root)
+   - Worktree path: `../drift-<branch-name>` (sibling directory next to the repo root)
 
 3. **Check branch doesn't already exist**
    Run: `git branch --list <branch-name>`
@@ -24,7 +24,7 @@ Feature name: "$ARGUMENTS"
 4. **Create branch and worktree**
    Run from the repo root:
    ```bash
-   git worktree add ../shoulder-tap-<branch-name> -b <branch-name>
+   git worktree add ../drift-<branch-name> -b <branch-name>
    ```
 
 5. **Confirm**
@@ -32,11 +32,11 @@ Feature name: "$ARGUMENTS"
    ```
    Worktree created:
      Branch: <branch-name>
-     Path:   ../shoulder-tap-<branch-name>
+     Path:   ../drift-<branch-name>
    ```
 
 6. **Access new worktree**
  Run from the repo root:
    ```bash
-   cd ../shoulder-tap-<branch-name>
+   cd ../drift-<branch-name>
    ```

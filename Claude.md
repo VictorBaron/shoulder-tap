@@ -1,14 +1,14 @@
-# ShoulderTap - Project Context
+# Drift - Project Context
 
 ## Project Overview
 
-This is a Turborepo monorepo with a NestJS API (runs in Docker), an Electron desktop app (TypeScript/React), and shared packages. Use `pnpm` as the package manager. Run `pnpm turbo dev` to start development.
+This is a Turborepo monorepo with a NestJS API (runs in Docker), an React app in TypeScript, and shared packages. Use `pnpm` as the package manager. Run `pnpm turbo dev` to start development.
 
 ## Workflow Rules
 
 ### Test-First Development (MANDATORY)
 
-When implementing any feature or change:
+When implementing any feature or change in domain logic:
 
 1. **Write behavioral tests FIRST** — Before writing any production code, write tests that describe the expected behavior using BDD-style descriptions (`should ...`).
 2. **Use the test-writer agent** — Always delegate test writing to `@.claude/agents/test-writer`.
@@ -17,15 +17,15 @@ When implementing any feature or change:
 
 ## Purpose
 
-This project is named ShoulderTap.
+This project is named Drift.
 It's a SaaS to have better Slack notifications that fits your schedule.
 It notifies you if it's urgent; or at the end of your focus time-blockers or meetings.
 
 ## Technical details
 
-ShoulderTap is a pnpm + Turborepo monorepo with two apps:
+Drift is a pnpm + Turborepo monorepo with two apps:
 - `apps/api/` — NestJS API backend
-- `apps/electron/` — Electron desktop app
+- `apps/app/` — React app
 
 Authentication is via Google OAuth.
 

@@ -1,11 +1,7 @@
 import { Inject, Injectable, Logger, type OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CommandBus } from '@nestjs/cqrs';
 import { App, ExpressReceiver, type InstallationStore } from '@slack/bolt';
 import type { Application } from 'express';
-import { StartFocusTimeCommand } from '@/accounts/application/commands/start-focus-time';
-import { FilterIncomingMessageCommand } from '@/messages/application/commands/filter-incoming-message';
-import { FilterIncomingReactionCommand } from '@/messages/application/commands/filter-incoming-reaction';
 import { SlackGateway } from '@/slack/domain/slack.gateway';
 import { INSTALLATION_STORE } from '@/slack/infrastructure/persistence/installation-store.token';
 import { isGenericMessage } from '@/slack/types';
@@ -43,7 +39,6 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
 
   constructor(
     private config: ConfigService,
-    private commandBus: CommandBus,
     @Inject(INSTALLATION_STORE)
     private installationStore: InstallationStore,
   ) {
@@ -81,35 +76,11 @@ export class BoltSlackGateway implements SlackGateway, OnModuleInit {
         return;
       }
 
-      await this.commandBus.execute(
-        new FilterIncomingMessageCommand({
-          messageEvent: event,
-        }),
-      );
+      return;
     });
 
     this.bolt.event('reaction_added', async ({ event }) => {
-      await this.commandBus.execute(
-        new FilterIncomingReactionCommand({
-          reactionEvent: event,
-        }),
-      );
-    });
-
-    this.bolt.command('/focus', async ({ ack, command }) => {
-      await ack();
-      const minutes = parseInt(command.text?.trim() ?? '30', 10) || 30;
-      try {
-        await this.commandBus.execute(
-          new StartFocusTimeCommand({
-            slackUserId: command.user_id,
-            teamId: command.team_id,
-            minutes,
-          }),
-        );
-      } catch (e) {
-        this.logger.error('Failed to start focus time', e);
-      }
+      return;
     });
   }
 }
