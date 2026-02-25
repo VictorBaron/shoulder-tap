@@ -5,9 +5,9 @@
 ## Prompt Claude Code
 
 ```
-Initialise un monorepo pour le projet "Drift" avec la structure suivante :
+Un monorepo pour le projet "Drift" a été initialisé avec la structure suivante :
 
-BACKEND (apps/api/) :
+BACKEND (apps/api/) - DEJA FAIT : 
 - NestJS avec TypeScript strict
 - MikroORM comme ORM avec PostgreSQL
 - Configuration : @nestjs/config avec .env
