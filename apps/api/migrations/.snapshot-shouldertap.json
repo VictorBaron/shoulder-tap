@@ -1,7 +1,5 @@
 {
-  "namespaces": [
-    "public"
-  ],
+  "namespaces": ["public"],
   "name": "public",
   "tables": [
     {
@@ -186,10 +184,7 @@
       "indexes": [
         {
           "keyName": "linear_ticket_snapshot_linear_issue_id_snapshot_date_index",
-          "columnNames": [
-            "linear_issue_id",
-            "snapshot_date"
-          ],
+          "columnNames": ["linear_issue_id", "snapshot_date"],
           "composite": true,
           "constraint": false,
           "primary": false,
@@ -197,10 +192,7 @@
         },
         {
           "keyName": "linear_ticket_snapshot_project_id_snapshot_week_start_index",
-          "columnNames": [
-            "project_id",
-            "snapshot_week_start"
-          ],
+          "columnNames": ["project_id", "snapshot_week_start"],
           "composite": true,
           "constraint": false,
           "primary": false,
@@ -208,9 +200,7 @@
         },
         {
           "keyName": "linear_ticket_snapshot_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -327,9 +317,7 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "email"
-          ],
+          "columnNames": ["email"],
           "composite": false,
           "keyName": "member_email_unique",
           "constraint": true,
@@ -337,9 +325,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "organization_id"
-          ],
+          "columnNames": ["organization_id"],
           "composite": false,
           "keyName": "member_organization_id_index",
           "constraint": false,
@@ -348,9 +334,7 @@
         },
         {
           "keyName": "member_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -454,9 +438,7 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "slack_team_id"
-          ],
+          "columnNames": ["slack_team_id"],
           "composite": false,
           "keyName": "organization_slack_team_id_unique",
           "constraint": true,
@@ -465,9 +447,7 @@
         },
         {
           "keyName": "organization_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -678,9 +658,7 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "organization_id"
-          ],
+          "columnNames": ["organization_id"],
           "composite": false,
           "keyName": "project_organization_id_index",
           "constraint": false,
@@ -689,9 +667,7 @@
         },
         {
           "keyName": "project_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -939,10 +915,7 @@
       "indexes": [
         {
           "keyName": "report_project_id_generated_at_index",
-          "columnNames": [
-            "project_id",
-            "generated_at"
-          ],
+          "columnNames": ["project_id", "generated_at"],
           "composite": true,
           "constraint": false,
           "primary": false,
@@ -950,10 +923,7 @@
         },
         {
           "keyName": "report_project_id_week_start_unique",
-          "columnNames": [
-            "project_id",
-            "week_start"
-          ],
+          "columnNames": ["project_id", "week_start"],
           "composite": true,
           "constraint": true,
           "primary": false,
@@ -961,9 +931,7 @@
         },
         {
           "keyName": "report_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -1147,9 +1115,7 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "team_id"
-          ],
+          "columnNames": ["team_id"],
           "composite": false,
           "keyName": "slack_installation_team_id_index",
           "constraint": false,
@@ -1157,9 +1123,7 @@
           "unique": false
         },
         {
-          "columnNames": [
-            "enterprise_id"
-          ],
+          "columnNames": ["enterprise_id"],
           "composite": false,
           "keyName": "slack_installation_enterprise_id_index",
           "constraint": false,
@@ -1167,9 +1131,7 @@
           "unique": false
         },
         {
-          "columnNames": [
-            "user_id"
-          ],
+          "columnNames": ["user_id"],
           "composite": false,
           "keyName": "slack_installation_user_id_index",
           "constraint": false,
@@ -1178,10 +1140,7 @@
         },
         {
           "keyName": "slack_installation_team_id_enterprise_id_unique",
-          "columnNames": [
-            "team_id",
-            "enterprise_id"
-          ],
+          "columnNames": ["team_id", "enterprise_id"],
           "composite": true,
           "constraint": true,
           "primary": false,
@@ -1189,9 +1148,7 @@
         },
         {
           "keyName": "slack_installation_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -1383,10 +1340,7 @@
       "indexes": [
         {
           "keyName": "slack_message_channel_id_ingested_at_index",
-          "columnNames": [
-            "channel_id",
-            "ingested_at"
-          ],
+          "columnNames": ["channel_id", "ingested_at"],
           "composite": true,
           "constraint": false,
           "primary": false,
@@ -1394,10 +1348,7 @@
         },
         {
           "keyName": "slack_message_project_id_ingested_at_index",
-          "columnNames": [
-            "project_id",
-            "ingested_at"
-          ],
+          "columnNames": ["project_id", "ingested_at"],
           "composite": true,
           "constraint": false,
           "primary": false,
@@ -1405,10 +1356,7 @@
         },
         {
           "keyName": "slack_message_channel_id_message_ts_unique",
-          "columnNames": [
-            "channel_id",
-            "message_ts"
-          ],
+          "columnNames": ["channel_id", "message_ts"],
           "composite": true,
           "constraint": true,
           "primary": false,
@@ -1416,9 +1364,7 @@
         },
         {
           "keyName": "slack_message_pkey",
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "primary": true,
