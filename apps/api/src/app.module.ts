@@ -3,16 +3,33 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
-
+import { MemberMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/member.mikroORM';
+import { OrganizationMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/organization.mikroORM';
 import { AiModule } from '@/ai/ai.module';
+import { LinearTicketSnapshotMikroOrm } from '@/integrations/linear/infrastructure/persistence/mikro-orm/models/linear-ticket-snapshot.mikroORM';
+import { SlackMessageMikroOrm } from '@/integrations/slack/infrastructure/persistence/mikro-orm/models/slack-message.mikroORM';
+import { ProjectMikroOrm } from '@/projects/infrastructure/persistence/mikro-orm/models/project.mikroORM';
+import { ReportMikroOrm } from '@/reports/infrastructure/persistence/mikro-orm/models/report.mikroORM';
 import { SlackInstallationMikroOrm } from '@/slack/infrastructure/persistence/mikro-orm/models/slack-installation.mikroORM';
 import { SlackModule } from '@/slack/slack.module';
 import { AuthModule } from './auth/auth.module';
+import { AccountsModule } from './core/accounts/accounts.module';
 import { IntegrationsModule } from './core/integrations/integrations.module';
 import { PipelineModule } from './core/pipeline/pipeline.module';
 import { ProjectsModule } from './core/projects/projects.module';
 import { ReportsModule } from './core/reports/reports.module';
 import { SchedulerModule } from './core/scheduler/scheduler.module';
+import { HealthModule } from './health/health.module';
+
+const entities = [
+  SlackInstallationMikroOrm,
+  OrganizationMikroOrm,
+  MemberMikroOrm,
+  ProjectMikroOrm,
+  SlackMessageMikroOrm,
+  LinearTicketSnapshotMikroOrm,
+  ReportMikroOrm,
+];
 
 @Module({
   imports: [
@@ -20,7 +37,7 @@ import { SchedulerModule } from './core/scheduler/scheduler.module';
     CqrsModule.forRoot(),
     MikroOrmModule.forRootAsync({
       useFactory: (config: ConfigService) => ({
-        entities: [SlackInstallationMikroOrm],
+        entities,
         driver: PostgreSqlDriver,
         clientUrl: config.get<string>('DATABASE_URL'),
         allowGlobalContext: true,
@@ -28,8 +45,10 @@ import { SchedulerModule } from './core/scheduler/scheduler.module';
       inject: [ConfigService],
     }),
     AiModule,
+    HealthModule,
     SlackModule,
     AuthModule,
+    AccountsModule,
     ProjectsModule,
     IntegrationsModule,
     ReportsModule,

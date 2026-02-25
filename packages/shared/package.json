@@ -1,0 +1,16 @@
+{
+  "name": "@drift/shared",
+  "version": "0.0.1",
+  "description": "Shared types between API and App",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "~5.7.3"
+  }
+}
