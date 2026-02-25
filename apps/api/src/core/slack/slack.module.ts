@@ -1,5 +1,9 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { TokenEncryption } from 'auth/token-encryption';
+import { AccountsModule } from '@/accounts/accounts.module';
 import { SLACK_GATEWAY } from './domain/slack.gateway';
 import { SlackInstallationRepository } from './domain/slack-installation.repository';
 import { BoltSlackGateway } from './infrastructure/gateways/bolt-slack.gateway';
@@ -9,7 +13,17 @@ import { SlackInstallationRepositoryMikroOrm } from './infrastructure/persistenc
 import { SlackInstallationStore } from './infrastructure/persistence/slack-installation.store';
 
 @Module({
-  imports: [MikroOrmModule.forFeature([SlackInstallationMikroOrm])],
+  imports: [
+    MikroOrmModule.forFeature([SlackInstallationMikroOrm]),
+    AccountsModule,
+    JwtModule.registerAsync({
+      useFactory: (config: ConfigService) => ({
+        secret: config.getOrThrow('JWT_SECRET'),
+        signOptions: { expiresIn: '30d' },
+      }),
+      inject: [ConfigService],
+    }),
+  ],
   providers: [
     {
       provide: SLACK_GATEWAY,
@@ -23,6 +37,7 @@ import { SlackInstallationStore } from './infrastructure/persistence/slack-insta
       provide: SlackInstallationRepository,
       useClass: SlackInstallationRepositoryMikroOrm,
     },
+    TokenEncryption,
   ],
   exports: [],
 })

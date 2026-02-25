@@ -2,6 +2,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
 import { MemberMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/member.mikroORM';
 import { OrganizationMikroOrm } from '@/accounts/infrastructure/persistence/mikro-orm/models/organization.mikroORM';
@@ -13,6 +14,7 @@ import { ReportMikroOrm } from '@/reports/infrastructure/persistence/mikro-orm/m
 import { SlackInstallationMikroOrm } from '@/slack/infrastructure/persistence/mikro-orm/models/slack-installation.mikroORM';
 import { SlackModule } from '@/slack/slack.module';
 import { AuthModule } from './auth/auth.module';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AccountsModule } from './core/accounts/accounts.module';
 import { IntegrationsModule } from './core/integrations/integrations.module';
 import { PipelineModule } from './core/pipeline/pipeline.module';
@@ -55,5 +57,6 @@ const entities = [
     PipelineModule,
     SchedulerModule,
   ],
+  providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
 export class AppModule {}

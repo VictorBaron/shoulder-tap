@@ -59,7 +59,7 @@ export class LinearTicketSnapshot extends AggregateRoot {
   private organizationId: string;
   private projectId: string | null;
   private linearIssueId: string;
-  private identifier: string;
+  private ticketIdentifier: string;
   private title: string;
   private description: string | null;
   private stateName: string;
@@ -76,7 +76,7 @@ export class LinearTicketSnapshot extends AggregateRoot {
     this.organizationId = props.organizationId;
     this.projectId = props.projectId;
     this.linearIssueId = props.linearIssueId;
-    this.identifier = props.identifier;
+    this.ticketIdentifier = props.identifier;
     this.title = props.title;
     this.description = props.description;
     this.stateName = props.stateName;
@@ -117,7 +117,7 @@ export class LinearTicketSnapshot extends AggregateRoot {
   }
 
   getIdentifier(): string {
-    return this.identifier;
+    return this.ticketIdentifier;
   }
 
   getTitle(): string {
@@ -134,7 +134,7 @@ export class LinearTicketSnapshot extends AggregateRoot {
       organizationId: this.organizationId,
       projectId: this.projectId,
       linearIssueId: this.linearIssueId,
-      identifier: this.identifier,
+      identifier: this.ticketIdentifier,
       title: this.title,
       description: this.description,
       stateName: this.stateName,
